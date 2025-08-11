@@ -1,0 +1,35 @@
+# argocd/datax/values.yaml
+
+# Argo CD 관련 전역 설정
+argo:
+    namespace: tx-argocd
+    project: default
+    server: https://kubernetes.default.svc
+    sourceRepo:
+        url: https://github.com/SmartX-Team/TwinX-Ops
+        branch: main
+
+# 개별 애플리케이션 설정
+applications:
+    '''
+    # 단순 yaml 파일들로 관리되는 애플리케이션
+    cluster-config:
+        enabled: true
+        namespace: default
+        syncWave: "-1"
+        source:
+            path: "argocd/twinx/apps/cluster-config"
+    # Helm 차트로 관리되는 애플리케이션
+    argocd:
+        enabled: true
+        namespace: tx-argocd
+        syncWave: "0"
+        source:
+            type: helm
+            repoURL: https://argoproj.github.io/argo-helm
+            chart: argo-cd
+            targetRevision: 8.1.1
+            helm:
+                valueFiles:
+                    - "argocd/twinx/apps/argocd/values.yaml"
+                      '''
