@@ -1,0 +1,36 @@
+# ./argocd/twinx/apps/cluster-config/namespaces.yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+    annotations:
+        "argocd.argoproj.io/sync-options": "Prune=false,Delete=false"
+    labels:
+        kubernetes.io/metadata.name: tx-argocd
+    name: tx-argocd
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+    annotations:
+        "argocd.argoproj.io/sync-options": "Prune=false,Delete=false"
+    labels:
+        kubernetes.io/metadata.name: rook-ceph
+    name: rook-ceph
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+    annotations:
+        "argocd.argoproj.io/sync-options": "Prune=false,Delete=false"
+    labels:
+        kubernetes.io/metadata.name: metallb
+    name: metallb
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+    annotations:
+        "argocd.argoproj.io/sync-options": "Prune=false,Delete=false"
+    labels:
+        kubernetes.io/metadata.name: tx-service
+    name: tx-service
