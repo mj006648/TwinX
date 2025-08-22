@@ -11,7 +11,6 @@ argo:
 
 # 개별 애플리케이션 설정
 applications:
-    '''
     # 단순 yaml 파일들로 관리되는 애플리케이션
     cluster-config:
         enabled: true
@@ -19,17 +18,22 @@ applications:
         syncWave: "-1"
         source:
             path: "argocd/twinx/apps/cluster-config"
-    # Helm 차트로 관리되는 애플리케이션
-    argocd:
+    metallb-resources:
         enabled: true
-        namespace: tx-argocd
+        namespace: metallb
+        syncWave: "1" # metallb Helm 차트 설치가 끝난 후에 실행
+        source:
+            path: "argocd/twinx/apps/metallb-resources"
+    # Helm 차트로 관리되는 애플리케이션
+    metallb:
+        enabled: true
+        namespace: metallb
         syncWave: "0"
         source:
             type: helm
-            repoURL: https://argoproj.github.io/argo-helm
-            chart: argo-cd
-            targetRevision: 8.1.1
+            repoURL: https://metallb.github.io/metallb
+            chart: metallb
+            targetRevision: 0.15.2
             helm:
                 valueFiles:
-                    - "argocd/twinx/apps/argocd/values.yaml"
-                      '''
+                    - "argocd/twinx/apps/metallb/values.yaml"
