@@ -6,7 +6,7 @@ argo:
     project: default
     server: https://kubernetes.default.svc
     sourceRepo:
-        url: https://github.com/SmartX-Team/TwinX-Ops
+        url: https://github.com/mj006648/TwinX.git
         branch: main
 
 # 개별 애플리케이션 설정
