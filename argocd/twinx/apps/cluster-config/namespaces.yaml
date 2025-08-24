@@ -5,8 +5,8 @@ metadata:
     annotations:
         "argocd.argoproj.io/sync-options": "Prune=false,Delete=false"
     labels:
-        kubernetes.io/metadata.name: tx-argocd
-    name: tx-argocd
+        kubernetes.io/metadata.name: argocd
+    name: argocd
 ---
 apiVersion: v1
 kind: Namespace
@@ -23,8 +23,8 @@ metadata:
     annotations:
         "argocd.argoproj.io/sync-options": "Prune=false,Delete=false"
     labels:
-        kubernetes.io/metadata.name: metallb
-    name: metallb
+        kubernetes.io/metadata.name: metallb-system
+    name: metallb-system
 ---
 apiVersion: v1
 kind: Namespace
@@ -34,3 +34,32 @@ metadata:
     labels:
         kubernetes.io/metadata.name: tx-service
     name: tx-service
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+    annotations:
+        "argocd.argoproj.io/sync-options": "Prune=false,Delete=false"
+    labels:
+        kubernetes.io/metadata.name: monitoring
+    name: monitoring
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+    annotations:
+        "argocd.argoproj.io/sync-options": "Prune=false,Delete=false"
+    labels:
+        kubernetes.io/metadata.name: changhyeon
+    name: changhyeon
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+    annotations:
+        "argocd.argoproj.io/sync-options": "Prune=false,Delete=false"
+    labels:
+        kubernetes.io/metadata.name: donghwan
+    name: donghwan
+---
+

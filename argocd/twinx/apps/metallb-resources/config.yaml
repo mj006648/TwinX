@@ -1,17 +1,19 @@
+# /argocd/twinx/apps/metallb-resources
+
 apiVersion: metallb.io/v1beta1
 kind: IPAddressPool
 metadata:
   name: primary-pool
-  namespace: metallb
+  namespace: metallb-system
 spec:
   addresses:
-  - 10.38.38.200-10.38.38.255
+  - 10.38.38.200~10.38.38.255
 ---
 apiVersion: metallb.io/v1beta1
 kind: L2Advertisement
 metadata:
   name: default-advertisement
-  namespace: metallb
+  namespace: metallb-system
 spec:
   ipAddressPools:
   - primary-pool

@@ -1,33 +1,43 @@
-# argocd/datax/values.yaml
-
+# ~/Git/TwinX/argocd/twinx
 # Argo CD 관련 전역 설정
 argo:
-    namespace: tx-argocd
+    namespace: argocd
     project: default
     server: https://kubernetes.default.svc
     sourceRepo:
         url: https://github.com/mj006648/TwinX.git
         branch: main
 
+
 # 개별 애플리케이션 설정
 applications:
     # 단순 yaml 파일들로 관리되는 애플리케이션
+    # 첫 번째 애플리케이션
     cluster-config:
-        enabled: true
-        namespace: default
-        syncWave: "-1"
-        source:
-            path: "argocd/twinx/apps/cluster-config"
+      enabled: true
+      namespace: default
+      syncWave: "-1"
+      source:
+        path: "argocd/twinx/apps/cluster-config"
+    
     metallb-resources:
-        enabled: true
-        namespace: metallb
-        syncWave: "1" # metallb Helm 차트 설치가 끝난 후에 실행
-        source:
-            path: "argocd/twinx/apps/metallb-resources"
+      enabled: true
+      namespace: metallb-system
+      syncWave: "1"
+      source:
+        path: "argocd/twinx/apps/metallb-resources"
+    
+    twinx-web:
+      enabled: true
+      namespace: tx-service
+      syncWave: "30"
+      source:
+        path: "argocd/twinx/apps/twinx-web"
+    
     # Helm 차트로 관리되는 애플리케이션
     metallb:
         enabled: true
-        namespace: metallb
+        namespace: metallb-system
         syncWave: "0"
         source:
             type: helm
