@@ -31,8 +31,7 @@ Kubernetes 기반의 고가용성(HA) 및 이기종(heterogeneous) 클러스터 
       <th>K8S IP</th>
       <th>K8S Version</th>
       <th>OS-Image</th>
-      <th>Container Runtime</th>
-      <th>제품 (Product)</th>
+      <th>GPU</th>
     </tr>
   </thead>
   <tbody>
@@ -43,8 +42,7 @@ Kubernetes 기반의 고가용성(HA) 및 이기종(heterogeneous) 클러스터 
       <td>10.38.38.9</td>
       <td>v1.33.3</td>
       <td>Ubuntu 24.04 LTS</td>
-      <td>containerd://1.7.1</td>
-      <td>- CPU: Intel Xeon D-1518 (4-Core, 4-Thread)<br/>- RAM: 32GB</td>
+      <td>-</td>
     </tr>
     <tr>
       <td>control2</td>
@@ -53,8 +51,7 @@ Kubernetes 기반의 고가용성(HA) 및 이기종(heterogeneous) 클러스터 
       <td>10.38.38.17</td>
       <td>v1.33.3</td>
       <td>Ubuntu 24.04 LTS</td>
-      <td>containerd://1.7.1</td>
-      <td>- CPU: Intel Xeon D-1518 (6-Core, 6-Thread)<br/>- RAM: 32GB</td>
+      <td>-</td>
     </tr>
     <tr>
       <td>control3</td>
@@ -63,8 +60,7 @@ Kubernetes 기반의 고가용성(HA) 및 이기종(heterogeneous) 클러스터 
       <td>10.38.38.25</td>
       <td>v1.33.3</td>
       <td>Ubuntu 24.04 LTS</td>
-      <td>containerd://1.7.1</td>
-      <td>- CPU: Intel Xeon D-1518 (4-Core, 8-Thread)<br/>- RAM: 32GB</td>
+      <td>-</td>
     </tr>
     <tr>
       <td>sv4000-1</td>
@@ -73,8 +69,7 @@ Kubernetes 기반의 고가용성(HA) 및 이기종(heterogeneous) 클러스터 
       <td>10.38.38.33</td>
       <td>v1.33.3</td>
       <td>Ubuntu 24.04 LTS</td>
-      <td>containerd://1.7.1</td>
-      <td>- CPU: AMD EPYC 9124 (16-Core, 32-Thread)<br/>- RAM: 256GB<br/>- GPU: NVIDIA RTX A6000 48GB x 2</td>
+      <td>NVIDIA RTX A6000 48GB x 2</td>
     </tr>
     <tr>
       <td>sv4000-2</td>
@@ -83,8 +78,7 @@ Kubernetes 기반의 고가용성(HA) 및 이기종(heterogeneous) 클러스터 
       <td>10.38.38.41</td>
       <td>v1.33.3</td>
       <td>Ubuntu 24.04 LTS</td>
-      <td>containerd://1.7.1</td>
-      <td>- CPU: AMD EPYC 9124 (16-Core, 32-Thread)<br/>- RAM: 256GB<br/>- GPU: NVIDIA RTX A6000 48GB, NVIDIA L40 48GB</td>
+      <td>NVIDIA RTX A6000 48GB, NVIDIA L40 48GB</td>
     </tr>
     <tr>
       <td>rm352-1</td>
@@ -93,8 +87,7 @@ Kubernetes 기반의 고가용성(HA) 및 이기종(heterogeneous) 클러스터 
       <td>10.38.38.105</td>
       <td>v1.33.3</td>
       <td>Ubuntu 24.04 LTS</td>
-      <td>containerd://1.7.1</td>
-      <td>- CPU: Intel Xeon Silver 4310 (12-Core, 24-Thread)<br/>- RAM: 128GB<br/>- GPU: Quadro RTX 6000 24GB, A100 40GB, A10 24GB</td>
+      <td>Quadro RTX 6000 24GB, NVIDIA A100 40GB, NVIDIA A10 24GB</td>
     </tr>
     <tr>
       <td>rm352-2</td>
@@ -103,8 +96,7 @@ Kubernetes 기반의 고가용성(HA) 및 이기종(heterogeneous) 클러스터 
       <td>10.38.38.49</td>
       <td>v1.33.3</td>
       <td>Ubuntu 24.04 LTS</td>
-      <td>containerd://1.7.1</td>
-      <td>- CPU: Intel Xeon Silver 4310 (12-Core, 24-Thread)<br/>- RAM: 64GB<br/>- GPU: Quadro RTX 6000 24GB, A100 40GB, A10 24GB</td>
+      <td>Quadro RTX 6000 24GB, NVIDIA A100 40GB, NVIDIA A10 24GB</td>
     </tr>
     <tr>
       <td>l40s</td>
@@ -113,8 +105,7 @@ Kubernetes 기반의 고가용성(HA) 및 이기종(heterogeneous) 클러스터 
       <td>10.38.38.97</td>
       <td>v1.33.3</td>
       <td>Ubuntu 24.04 LTS</td>
-      <td>containerd://1.7.1</td>
-      <td>- CPU: AMD EPYC 9254 (48-Core, 96-Thread)<br/>- RAM: 755GB<br/>- GPU: NVIDIA L40S 48GB x 6</td>
+      <td>NVIDIA L40S 48GB x 6</td>
     </tr>
     <tr>
       <td>armserver</td>
@@ -123,8 +114,7 @@ Kubernetes 기반의 고가용성(HA) 및 이기종(heterogeneous) 클러스터 
       <td>-</td>
       <td>v1.33.3</td>
       <td>Ubuntu 24.04 LTS</td>
-      <td>containerd://1.7.1</td>
-      <td>- CPU: ARM Neoverse-N1 (80-Core, 80-Thread)<br/>- RAM: 512GB</td>
+      <td>-</td>
     </tr>
     <tr>
       <td>edgebox1</td>
@@ -133,8 +123,7 @@ Kubernetes 기반의 고가용성(HA) 및 이기종(heterogeneous) 클러스터 
       <td>10.38.38.57</td>
       <td>v1.33.3</td>
       <td>Ubuntu 24.04 LTS</td>
-      <td>containerd://1.7.1</td>
-      <td>- CPU: Intel Xeon Silver 4310 (12-Core, 24-Thread)<br/>- RAM: 128GB<br/>- GPU: Tesla T4 16GB</td>
+      <td>Tesla T4 16GB</td>
     </tr>
     <tr>
       <td>edgebox2</td>
@@ -143,8 +132,7 @@ Kubernetes 기반의 고가용성(HA) 및 이기종(heterogeneous) 클러스터 
       <td>10.38.38.65</td>
       <td>v1.33.3</td>
       <td>Ubuntu 24.04 LTS</td>
-      <td>containerd://1.7.1</td>
-      <td>- CPU: Intel Xeon Silver 4310 (12-Core, 24-Thread)<br/>- RAM: 32GB<br/>- GPU: Tesla T4 16GB</td>
+      <td>Tesla T4 16GB</td>
     </tr>
      <tr>
       <td>edgebox3</td>
@@ -153,8 +141,7 @@ Kubernetes 기반의 고가용성(HA) 및 이기종(heterogeneous) 클러스터 
       <td>10.38.38.73</td>
       <td>v1.33.3</td>
       <td>Ubuntu 24.04 LTS</td>
-      <td>containerd://1.7.1</td>
-      <td>- CPU: Intel Xeon Silver 4310 (12-Core, 24-Thread)<br/>- RAM: 128GB<br/>- GPU: Tesla T4 16GB</td>
+      <td>Tesla T4 16GB</td>
     </tr>
      <tr>
       <td>edgebox4</td>
@@ -163,8 +150,7 @@ Kubernetes 기반의 고가용성(HA) 및 이기종(heterogeneous) 클러스터 
       <td>10.38.38.81</td>
       <td>v1.33.3</td>
       <td>Ubuntu 24.04 LTS</td>
-      <td>containerd://1.7.1</td>
-      <td>- CPU: Intel Xeon Silver 4310 (12-Core, 24-Thread)<br/>- RAM: 128GB<br/>- GPU: Tesla T4 16GB</td>
+      <td>Tesla T4 16GB</td>
     </tr>
   </tbody>
 </table>
