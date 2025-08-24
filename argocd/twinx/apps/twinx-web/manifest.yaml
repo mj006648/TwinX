@@ -47,4 +47,4 @@ spec:
   # [핵심!] 서비스 타입을 LoadBalancer로 지정합니다.
   type: LoadBalancer
   # [핵심!] MetalLB가 할당해줄 고정 IP를 직접 요청합니다.
-  loadBalancerIP: 10.38.38.255
+  loadBalancerIP: 10.38.38.201
