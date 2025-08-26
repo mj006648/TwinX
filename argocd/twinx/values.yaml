@@ -58,7 +58,7 @@ applications:
 
     # Prometheus 스택 배포
     prometheus:
-      enabled: true
+      enabled: false
       namespace: monitoring
       syncWave: "3" # Secret이 준비된 후 실행
       source:
@@ -72,7 +72,7 @@ applications:
 
     # Grafana 배포
     grafana:
-      enabled: true
+      enabled: false
       namespace: monitoring
       syncWave: "4" # Secret과 Prometheus가 모두 준비된 후 실행
       source:
