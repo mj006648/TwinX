@@ -1,0 +1,49 @@
+# Prometheus 서버 설정
+server:
+  statefulSet:
+    enabled: true
+  persistentVolume:
+    enabled: true
+    size: "10Gi"
+    storageClass: "ceph-nfs-sc"
+  resources:
+    requests:
+      cpu: "200m"
+      memory: "512Mi"
+    limits:
+      cpu: "1000m"
+      memory: "2Gi"
+
+# Alertmanager 설정
+alertmanager:
+  persistence:
+    enabled: true
+    size: "2Gi"
+    storageClass: "ceph-nfs-sc"
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "128Mi"
+    limits:
+      cpu: "200m"
+      memory: "256Mi"
+
+# Node Exporter 설정
+prometheus-node-exporter:
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "64Mi"
+    limits:
+      cpu: "200m"
+      memory: "128Mi"
+
+# Kube State Metrics 설정
+kube-state-metrics:
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "128Mi"
+    limits:
+      cpu: "200m"
+      memory: "256Mi"

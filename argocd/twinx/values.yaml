@@ -27,6 +27,14 @@ applications:
       source:
         path: "argocd/twinx/apps/metallb-resources"
     
+    # Grafana Secret을 가장 먼저 배포
+    grafana-resources:
+      enabled: true
+      namespace: monitoring
+      syncWave: "2" # Prometheus보다 먼저 실행되어야 함
+      source:
+        path: "argocd/twinx/apps/grafana-resources"      
+
     twinx-web:
       enabled: true
       namespace: tx-service
@@ -47,3 +55,31 @@ applications:
             helm:
                 valueFiles:
                     - "argocd/twinx/apps/metallb/values.yaml"
+
+    # Prometheus 스택 배포
+    prometheus:
+      enabled: true
+      namespace: monitoring
+      syncWave: "3" # Secret이 준비된 후 실행
+      source:
+        type: helm
+        repoURL: https://prometheus-community.github.io/helm-charts
+        chart: prometheus
+        targetRevision: 27.32.0
+        helm:
+          valueFiles:
+            - "argocd/twinx/apps/prometheus/values.yaml"
+
+    # Grafana 배포
+    grafana:
+      enabled: true
+      namespace: monitoring
+      syncWave: "4" # Secret과 Prometheus가 모두 준비된 후 실행
+      source:
+        type: helm
+        repoURL: https://grafana.github.io/helm-charts
+        chart: grafana
+        targetRevision: 9.3.4
+        helm:
+          valueFiles:
+            - "argocd/twinx/apps/grafana/values.yaml"
