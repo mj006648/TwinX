@@ -1,0 +1,15 @@
+# /argocd/twinx/apps/cluster-config/storageclass.yaml
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: nfs-dx-ssd-a # 스토리지 클래스의 이름
+provisioner: nfs.csi.k8s.io
+parameters:
+  # 실제 NFS 서버의 IP 주소
+  server: "10.38.36.221"
+  # NFS 서버에서 공유된 디렉터리 경로
+  share: "/netai-sys"
+reclaimPolicy: Retain
+volumeBindingMode: Immediate
+mountOptions:
+  - nfsvers=4.1
