@@ -13,6 +13,11 @@ server:
     limits:
       cpu: "1000m"
       memory: "2Gi"
+  securityContext:
+    fsGroup: 1001
+    runAsUser: 1001
+    runAsGroup: 1001
+    runAsNonRoot: true
 
 # Alertmanager 설정
 alertmanager:
@@ -27,6 +32,11 @@ alertmanager:
     limits:
       cpu: "200m"
       memory: "256Mi"
+  securityContext:
+    fsGroup: 1001
+    runAsUser: 1001
+    runAsGroup: 1001
+    runAsNonRoot: true
 
 # Node Exporter 설정
 prometheus-node-exporter:
