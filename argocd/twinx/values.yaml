@@ -95,4 +95,4 @@ applications:
         targetRevision: 4.11.0
         helm:
           valueFiles:
-            - "argocd/twinx/apps/csi-driver-nfs/values.yaml
+            - "argocd/twinx/apps/csi-driver-nfs/values.yaml"
