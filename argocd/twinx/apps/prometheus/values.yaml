@@ -5,7 +5,7 @@ server:
   persistentVolume:
     enabled: true
     size: "10Gi"
-    storageClass: "ceph-nfs-sc"
+    storageClass: "nfs-dx-ssd-a"
   resources:
     requests:
       cpu: "200m"
@@ -19,7 +19,7 @@ alertmanager:
   persistence:
     enabled: true
     size: "2Gi"
-    storageClass: "ceph-nfs-sc"
+    storageClass: "nfs-dx-ssd-a"
   resources:
     requests:
       cpu: "100m"
