@@ -1,0 +1,14 @@
+customLabels: {}
+image:
+    baseRepo: registry.k8s.io
+    nfs:
+        repository: registry.k8s.io/sig-storage/nfsplugin
+        tag: v4.11.0
+        pullPolicy: IfNotPresent
+    # ... (이하 모든 기본 values 내용)
+
+# ...
+# storageClass 섹션은 Argo CD로 관리하지 않기로 했으므로
+# create: false 로 두거나 그대로 둡니다.
+storageClass:
+  create: false

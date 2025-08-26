@@ -83,3 +83,16 @@ applications:
         helm:
           valueFiles:
             - "argocd/twinx/apps/grafana/values.yaml"
+
+    csi-driver-nfs:
+    enabled: true
+    namespace: kube-system  # 드라이버가 설치될 네임스페이스
+    syncWave: "5"
+    source:
+      type: helm
+      repoURL: https://raw.githubusercontent.com/kubernetes-csi/csi-driver-nfs/master/charts
+      chart: csi-driver-nfs
+      targetRevision: 4.11.0
+      helm:
+        valueFiles:
+          - "argocd/twinx/apps/csi-driver-nfs/values.yaml
