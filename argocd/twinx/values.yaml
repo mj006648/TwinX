@@ -154,3 +154,32 @@ applications:
         helm:
           valueFiles:
             - "argocd/twinx/apps/postgresql/values.yaml"
+
+    nessie:
+      enabled: true
+      namespace: nessie-ns
+      syncWave: "8" # PostgreSQL 이후에 배포되도록 설정
+      source:
+        type: helm
+        repoURL: https://charts.projectnessie.org
+        chart: nessie
+        releaseName: nessie # Helm 릴리스 이름을 'nessie'로 고정
+        targetRevision: "0.104.9"
+        helm:
+          valueFiles:
+            - "argocd/twinx/apps/nessie/values.yaml"
+      syncOptions:
+        - CreateNamespace=true # ArgoCD가 네임스페이스를 자동으로 생성
+
+    nessie-resources:
+      enabled: true
+      namespace: nessie-ns
+      syncWave: "9" # nessie Helm 차트와 동시에 배포
+      source:
+        path: "argocd/twinx/apps/nessie-resources"
+        directory:
+          # values.yaml을 제외한 나머지 YAML 파일들만 배포 대상으로 지정
+          exclude: "values.yaml"
+          recurse: true
+      syncOptions:
+        - CreateNamespace=true
