@@ -23,7 +23,7 @@ spec:
       externalAccess:
         type: loadBalancer
         loadBalancer:
-          domain: minix.local
+          domain: twinx.local
   podTemplate:
     resources:
       requests:
