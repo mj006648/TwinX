@@ -42,14 +42,14 @@ web:
 # Superset 백그라운드 워커 (Celery) 설정
 #==============================================================================
 worker:
-  # ★★★★★ [핵심 수정] 메모리 부족(OOMKilled) 문제 해결을 위해 리소스 대폭 상향 ★★★★★
+  # 메모리 부족(OOMKilled) 문제 해결을 위해 리소스를 넉넉하게 설정
   resources:
     requests:
       cpu: "1"
-      memory: "4Gi" # 요청 메모리도 넉넉하게
+      memory: "4Gi"
     limits:
       cpu: "2"
-      memory: "8Gi" # 한도 메모리를 8Gi로 대폭 상향
+      memory: "8Gi"
 
   # 데이터베이스 드라이버 라이브러리를 추가하기 위한 설정
   extraEnvVars:
@@ -76,20 +76,25 @@ worker:
         - name: custom-libs
           mountPath: /opt/bitnami/superset/venv/lib/python3.10/site-packages/custom_libs
           
-  # Probe 설정은 그대로 유지 (이미 최신 차트의 올바른 설정이 적용됨)
+  #############################################################################
+  # ★★★★★ [최종 수정] Probe 초기 대기 시간을 5분으로 대폭 상향 ★★★★★
+  # Worker가 완전히 준비될 시간을 아주 넉넉하게 확보하여 Probe 실패를 방지합니다.
+  #############################################################################
   livenessProbe:
     enabled: true
-    initialDelaySeconds: 120 # 초기 대기 시간을 2분으로 늘려 안정성 확보
+    # 파드가 시작되고 300초(5분) 후에 첫 Probe를 시작합니다.
+    initialDelaySeconds: 300
     periodSeconds: 30
-    timeoutSeconds: 20
+    timeoutSeconds: 30
     failureThreshold: 5
     successThreshold: 1
 
   readinessProbe:
     enabled: true
-    initialDelaySeconds: 120
+    # Readiness도 동일하게 5분 대기
+    initialDelaySeconds: 300
     periodSeconds: 30
-    timeoutSeconds: 20
+    timeoutSeconds: 30
     failureThreshold: 5
     successThreshold: 1
 
@@ -108,3 +113,4 @@ postgresql:
   enabled: true
 redis:
   enabled: true
+
