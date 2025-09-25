@@ -1,0 +1,269 @@
+# FILE: argocd/twinx/apps/job-configs/02-scripts-configmap.yaml
+# 최종 버전: ingestion/merge 잡의 모든 논리적 문제를 해결하고 안정성을 극대화한 완전한 코드
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: spark-scripts
+  namespace: spark-operator
+data:
+  # --- SCRIPT 1: 실시간 데이터 수집 및 Staging 담당 ---
+  dynamic_ingestion.py: |
+    import os
+    from pyspark.sql import SparkSession
+    from pyspark.sql.functions import col, lit, struct, to_json, current_timestamp, when
+    from pyspark.sql.utils import AnalysisException
+
+    S3_ENDPOINT = os.environ.get("S3_ENDPOINT")
+    S3_ACCESS_KEY = os.environ.get("S3_ACCESS_KEY")
+    S3_SECRET_KEY = os.environ.get("S3_SECRET_KEY")
+    NESSIE_URI = "http://nessie.nessie-ns.svc:19120/api/v1"
+    KAFKA_BOOTSTRAP_SERVERS = "10.38.38.209:9092"
+    WAREHOUSE_PATH = "s3a://iceberg-data/warehouse"
+
+    def get_spark_session():
+        builder = (
+            SparkSession.builder.appName("DynamicIngestionProcessor")
+            .config("spark.jars.packages", "org.apache.iceberg:iceberg-spark-runtime-3.5_2.12:1.9.0,org.projectnessie.nessie-integrations:nessie-spark-extensions-3.5_2.12:0.103.3,org.apache.hadoop:hadoop-aws:3.3.4,com.amazonaws:aws-java-sdk-bundle:1.12.262,org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.0")
+            .config("spark.sql.extensions", "org.apache.iceberg.spark.extensions.IcebergSparkSessionExtensions,org.projectnessie.spark.extensions.NessieSparkSessionExtensions")
+            .config("spark.sql.catalog.nessie", "org.apache.iceberg.spark.SparkCatalog")
+            .config("spark.sql.catalog.nessie.catalog-impl", "org.apache.iceberg.nessie.NessieCatalog")
+            .config("spark.sql.catalog.nessie.uri", NESSIE_URI)
+            .config("spark.sql.catalog.nessie.warehouse", WAREHOUSE_PATH)
+        )
+        if S3_ENDPOINT: builder.config("spark.hadoop.fs.s3a.endpoint", S3_ENDPOINT)
+        if S3_ACCESS_KEY: builder.config("spark.hadoop.fs.s3a.access.key", S3_ACCESS_KEY)
+        if S3_SECRET_KEY: builder.config("spark.hadoop.fs.s3a.secret.key", S3_SECRET_KEY)
+        builder.config("spark.hadoop.fs.s3a.path.style.access", "true")
+        builder.config("spark.hadoop.fs.s3a.connection.ssl.enabled", "false")
+        builder.config("spark.hadoop.fs.s3a.impl", "org.apache.hadoop.fs.s3a.S3AFileSystem")
+        return builder.getOrCreate()
+
+    def ensure_onboarding_completed(spark, topic_name, topic_df):
+        dev_branch_name = f"{topic_name}_dev"
+        try:
+            spark.sql(f"USE REFERENCE `{dev_branch_name}` IN nessie")
+            print(f"Branch '{dev_branch_name}' already exists. Onboarding previously completed.")
+            return True
+        except Exception as e:
+            if "NessieReferenceNotFoundException" not in str(e):
+                print(f"🔥 ERROR checking branch existence for {topic_name}: {e}")
+                return False
+
+        print(f"Branch '{dev_branch_name}' not found. Starting onboarding for topic '{topic_name}'...")
+        try:
+            json_rdd = topic_df.select(col("value").cast("string")).rdd.map(lambda r: r.value)
+            if json_rdd.isEmpty():
+                print("No data in this batch to infer schema. Onboarding will be retried.")
+                return False
+                
+            json_df = spark.read.json(json_rdd).cache()
+            
+            spark.sql("USE REFERENCE main IN nessie")
+            
+            df_for_schema = json_df
+            if "timestamp" in df_for_schema.columns:
+                df_for_schema = df_for_schema.withColumn("timestamp", col("timestamp").cast("timestamp"))
+
+            prod_namespace = f"{topic_name}_prod"
+            staging_namespace = f"{topic_name}_staging"
+            trusted_table = f"{topic_name}_trusted"
+            untrusted_table = f"{topic_name}_untrusted"
+            
+            prod_table_fqn = f"nessie.`{prod_namespace}`.`{trusted_table}`"
+            staging_trusted_fqn = f"nessie.`{staging_namespace}`.`{trusted_table}`"
+            staging_untrusted_fqn = f"nessie.`{staging_namespace}`.`{untrusted_table}`"
+
+            spark.sql(f"CREATE NAMESPACE IF NOT EXISTS nessie.`{prod_namespace}`")
+            spark.sql(f"CREATE NAMESPACE IF NOT EXISTS nessie.`{staging_namespace}`")
+
+            df_for_schema.createOrReplaceTempView("temp_schema_view_onboarding")
+            partition_by = "PARTITIONED BY (days(timestamp))" if "timestamp" in df_for_schema.columns else ""
+            
+            spark.sql(f"DROP TABLE IF EXISTS {prod_table_fqn}")
+            spark.sql(f"CREATE TABLE {prod_table_fqn} USING iceberg {partition_by} AS SELECT * FROM temp_schema_view_onboarding LIMIT 0")
+            
+            spark.sql(f"DROP TABLE IF EXISTS {staging_trusted_fqn}")
+            spark.sql(f"CREATE TABLE {staging_trusted_fqn} USING iceberg {partition_by} AS SELECT * FROM temp_schema_view_onboarding LIMIT 0")
+
+            spark.sql(f"DROP TABLE IF EXISTS {staging_untrusted_fqn}")
+            spark.sql(f"CREATE TABLE {staging_untrusted_fqn} (raw_payload STRING, validation_error STRING, processing_timestamp TIMESTAMP) USING iceberg PARTITIONED BY (days(processing_timestamp))")
+
+            print(f"Tables created/recreated on 'main' for topic '{topic_name}'.")
+
+            spark.sql(f"CREATE BRANCH `{dev_branch_name}` IN nessie FROM main")
+            print(f"✅ Branch '{dev_branch_name}' created successfully.")
+            return True
+            
+        except Exception as e:
+            print(f"🔥 ERROR during onboarding for topic {topic_name}: {e}")
+            return False
+        finally:
+            spark.catalog.dropTempView("temp_schema_view_onboarding")
+            json_df.unpersist()
+
+    def process_ingestion_logic(spark, micro_batch_df):
+        if micro_batch_df.rdd.isEmpty(): return
+
+        distinct_topics = [row.topic for row in micro_batch_df.select("topic").distinct().collect()]
+        for topic_name in distinct_topics:
+            print(f"\n--- Ingesting topic: {topic_name} ---")
+            topic_df = micro_batch_df.filter(col("topic") == topic_name)
+            
+            onboarding_ok = ensure_onboarding_completed(spark, topic_name, topic_df)
+            if not onboarding_ok:
+                print(f"Onboarding not complete for {topic_name}, skipping data write for this batch.")
+                continue
+
+            dev_branch_name = f"{topic_name}_dev"
+            staging_namespace = f"{topic_name}_staging"
+            trusted_table = f"{topic_name}_trusted"
+            untrusted_table = f"{topic_name}_untrusted"
+            
+            try:
+                spark.sql(f"USE REFERENCE `{dev_branch_name}` IN nessie")
+                
+                json_rdd = topic_df.select(col("value").cast("string")).rdd.map(lambda r: r.value)
+                if json_rdd.isEmpty(): continue
+                
+                json_df = spark.read.json(json_rdd)
+                original_columns = json_df.columns
+                
+                if "timestamp" in json_df.columns:
+                    json_df = json_df.withColumn("timestamp", col("timestamp").cast("timestamp"))
+                    
+                validated_df = json_df.withColumn("validation_error", when(col("eventId").isNull(), "eventId is null").otherwise(lit(None)))
+                trusted_df = validated_df.filter(col("validation_error").isNull())
+                untrusted_df = validated_df.filter(col("validation_error").isNotNull())
+
+                if not trusted_df.rdd.isEmpty():
+                    trusted_df.select(original_columns).writeTo(f"nessie.`{staging_namespace}`.`{trusted_table}`").append()
+                    print(f"✅ Appended {trusted_df.count()} trusted rows to '{dev_branch_name}'.")
+                
+                if not untrusted_df.rdd.isEmpty():
+                    untrusted_df.withColumn("raw_payload", to_json(struct([c for c in original_columns]))) \
+                        .select("raw_payload", "validation_error").withColumn("processing_timestamp", current_timestamp()) \
+                        .writeTo(f"nessie.`{staging_namespace}`.`{untrusted_table}`").append()
+                    print(f"✅ Appended {untrusted_df.count()} untrusted rows to '{dev_branch_name}'.")
+            except Exception as e:
+                print(f"🔥 FAILED TO WRITE DATA for topic {topic_name}. REAL ERROR: {e}")
+
+    def foreach_batch_wrapper(df, batch_id):
+        print(f"--- Processing Batch ID: {batch_id} ---")
+        spark = SparkSession.builder.getOrCreate()
+        process_ingestion_logic(spark, df)
+
+    def main():
+        spark = get_spark_session()
+        
+        kafka_df = spark.readStream.format("kafka").option("kafka.bootstrap.servers", KAFKA_BOOTSTRAP_SERVERS).option("subscribePattern", "iceberg-.*").option("startingOffsets", "earliest").load()
+        
+        query = (
+            kafka_df.writeStream
+            .foreachBatch(foreach_batch_wrapper)
+            .option("checkpointLocation", f"{WAREHOUSE_PATH}/_checkpoints/dynamic_ingestion")
+            .trigger(processingTime='1 minute')
+            .start()
+        )
+        query.awaitTermination()
+
+    if __name__ == "__main__":
+        main()
+
+  # --- SCRIPT 2: 주기적으로 Staging 데이터를 Prod(main)으로 발행 ---
+  periodic_merge_to_main.py: |
+    import os
+    from pyspark.sql import SparkSession
+    from pyspark.sql.functions import col, trim, lower
+
+    S3_ENDPOINT = os.environ.get("S3_ENDPOINT")
+    S3_ACCESS_KEY = os.environ.get("S3_ACCESS_KEY")
+    S3_SECRET_KEY = os.environ.get("S3_SECRET_KEY")
+    NESSIE_URI = "http://nessie.nessie-ns.svc:19120/api/v1"
+    WAREHOUSE_PATH = "s3a://iceberg-data/warehouse"
+
+    def get_spark_session():
+        builder = (
+            SparkSession.builder.appName("PeriodicMergeToMain")
+            .config("spark.jars.packages", "org.apache.iceberg:iceberg-spark-runtime-3.5_2.12:1.9.0,org.projectnessie.nessie-integrations:nessie-spark-extensions-3.5_2.12:0.103.3,org.apache.hadoop:hadoop-aws:3.3.4,com.amazonaws:aws-java-sdk-bundle:1.12.262")
+            .config("spark.sql.extensions", "org.apache.iceberg.spark.extensions.IcebergSparkSessionExtensions,org.projectnessie.spark.extensions.NessieSparkSessionExtensions")
+            .config("spark.sql.catalog.nessie", "org.apache.iceberg.spark.SparkCatalog")
+            .config("spark.sql.catalog.nessie.catalog-impl", "org.apache.iceberg.nessie.NessieCatalog")
+            .config("spark.sql.catalog.nessie.uri", NESSIE_URI)
+            .config("spark.sql.catalog.nessie.warehouse", WAREHOUSE_PATH)
+        )
+        if S3_ENDPOINT: builder.config("spark.hadoop.fs.s3a.endpoint", S3_ENDPOINT)
+        if S3_ACCESS_KEY: builder.config("spark.hadoop.fs.s3a.access.key", S3_ACCESS_KEY)
+        if S3_SECRET_KEY: builder.config("spark.hadoop.fs.s3a.secret.key", S3_SECRET_KEY)
+        builder.config("spark.hadoop.fs.s3a.path.style.access", "true")
+        builder.config("spark.hadoop.fs.s3a.connection.ssl.enabled", "false")
+        builder.config("spark.hadoop.fs.s3a.impl", "org.apache.hadoop.fs.s3a.S3AFileSystem")
+        return builder.getOrCreate()
+
+    def main():
+        spark = get_spark_session()
+        print("--- Starting Periodic Merge to Main Job ---")
+        
+        all_references_df = spark.sql("LIST REFERENCES IN nessie")
+        dev_branches_df = all_references_df.filter(
+            (lower(trim(col("refType"))) == "branch") & (col("name").rlike(r".*_dev$"))
+        )
+        dev_branches = [row.name for row in dev_branches_df.select("name").collect()]
+
+        if not dev_branches:
+            print("No '_dev' branches found to process. Exiting.")
+            spark.stop()
+            return
+
+        print(f"Found dev branches to process: {dev_branches}")
+
+        for dev_branch in dev_branches:
+            try:
+                topic_name = dev_branch[:-4]
+                prod_namespace = f"{topic_name}_prod"
+                staging_namespace = f"{topic_name}_staging"
+                trusted_table = f"{topic_name}_trusted"
+                
+                prod_table_fqn = f"nessie.`{prod_namespace}`.`{trusted_table}`"
+                staging_table_fqn = f"nessie.`{staging_namespace}`.`{trusted_table}`"
+
+                print(f"\n--- Processing branch: {dev_branch} ---")
+
+                # 1. 소스 데이터가 있는 dev 브랜치로 컨텍스트 전환
+                print(f"Switching to source branch: {dev_branch}")
+                spark.sql(f"USE REFERENCE `{dev_branch}` IN nessie")
+                
+                # 2. 소스 테이블을 읽어 임시 뷰 생성
+                source_df = spark.read.table(staging_table_fqn)
+                if source_df.rdd.isEmpty():
+                    print(f"No new data to merge in branch '{dev_branch}'. Skipping.")
+                    continue
+                
+                source_df.createOrReplaceTempView("source_view_for_merge")
+                print(f"Created temporary view with {source_df.count()} rows.")
+
+                # 3. 타겟 데이터가 있는 main 브랜치로 다시 컨텍스트 전환
+                print("Switching back to target branch: main")
+                spark.sql("USE REFERENCE main IN nessie")
+
+                # 4. 이제 main 컨텍스트에서 MERGE 실행
+                merge_sql = f"""
+                MERGE INTO {prod_table_fqn} t
+                USING source_view_for_merge s
+                ON t.eventId = s.eventId
+                WHEN NOT MATCHED THEN INSERT *
+                """
+                print(f"Executing MERGE for {prod_table_fqn}...")
+                spark.sql(merge_sql)
+                print(f"✅ Successfully merged data from '{dev_branch}' to 'main'.")
+
+            except Exception as e:
+                print(f"🔥 ERROR: Failed to process branch {dev_branch}. Reason: {e}")
+                continue
+        
+        print("\n--- Periodic Merge to Main Job Finished ---")
+        spark.stop()
+
+    if __name__ == "__main__":
+        main()
+

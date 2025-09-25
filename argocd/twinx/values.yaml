@@ -212,6 +212,39 @@ applications:
       syncWave: "12"
       source:
         path: "argocd/twinx/apps/confluent-resources"
+    
+    spark-operator: # (기존 spark-operator-helm에서 이름 변경)
+      enabled: true
+      namespace: spark-operator
+      syncWave: "13"
+      source:
+        type: helm
+        repoURL: https://kubeflow.github.io/spark-operator
+        chart: spark-operator
+        targetRevision: "1.3.2" # 최신 버전으로 업데이트 (권장)
+        helm:
+          releaseName: spark-operator
+          valueFiles:
+            - "argocd/twinx/apps/spark-operator/values.yaml"
+      syncOptions:
+        - CreateNamespace=true
+
+    # Wave 15: Spark 잡을 위한 RBAC, Secret 및 스크립트 ConfigMap
+    spark-job-configs:
+      enabled: true
+      namespace: spark-operator
+      syncWave: "14"
+      source:
+        path: "argocd/twinx/apps/job-configs"
+
+    # Wave 16: 모든 Spark 애플리케이션(현재는 스트리밍 잡 하나)을 관리
+    spark-applications: # (기존 spark-job-schedules에서 이름 변경)
+      enabled: true
+      namespace: spark-operator
+      syncWave: "15"
+      source:
+        path: "argocd/twinx/apps/job-schedules"
+
 
     superset:
       enabled: true

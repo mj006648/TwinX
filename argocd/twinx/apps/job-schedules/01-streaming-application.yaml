@@ -1,0 +1,63 @@
+# FILE: argocd/minix/apps/job-schedules/01-streaming-application.yaml
+# 최종 수정: 수집(ingestion) 스트리밍 잡을 실행하도록 이름 및 파일 경로 수정
+
+apiVersion: "sparkoperator.k8s.io/v1beta2"
+kind: SparkApplication
+metadata:
+  name: dynamic-kafka-ingestion
+  namespace: spark-operator
+spec:
+  type: Python
+  mode: cluster
+  image: "ich6648/spark-iceberg-nessie-kafka:9.0"
+  imagePullPolicy: Always
+  # [수정] 수집 스크립트를 지정
+  mainApplicationFile: "local:///mnt/scripts/dynamic_ingestion.py"
+  sparkVersion: "3.5.0"
+  restartPolicy:
+    type: Always # 스트리밍 잡은 항상 재시작되어야 함
+  driver:
+    serviceAccount: spark-sa
+    cores: 1
+    memory: "1g"
+    envFrom:
+      - secretRef:
+          name: s3-creds-for-streaming-spark
+    volumeMounts:
+      - name: scripts-volume
+        mountPath: /mnt/scripts
+    hostAliases:
+    - ip: "10.38.38.206"
+      hostnames:
+      - "b0.twinx.local"
+    - ip: "10.38.38.207"
+      hostnames:
+      - "b1.twinx.local"
+    - ip: "10.38.38.208"
+      hostnames:
+      - "b2.twinx.local"
+  executor:
+    instances: 2
+    cores: 1
+    memory: "1g"
+    envFrom:
+      - secretRef:
+          name: s3-creds-for-streaming-spark
+    volumeMounts:
+      - name: scripts-volume
+        mountPath: /mnt/scripts
+    hostAliases:
+    - ip: "10.38.38.206"
+      hostnames:
+      - "b0.twinx.local"
+    - ip: "10.38.38.207"
+      hostnames:
+      - "b1.twinx.local"
+    - ip: "10.38.38.208"
+      hostnames:
+      - "b2.twinx.local"
+  volumes:
+    - name: scripts-volume
+      configMap:
+        name: spark-scripts
+
