@@ -183,3 +183,32 @@ applications:
           recurse: true
       syncOptions:
         - CreateNamespace=true
+
+    confluent-operator:
+      enabled: true
+      namespace: confluent
+      syncWave: "10"
+      source:
+        type: helm
+        repoURL: https://packages.confluent.io/helm
+        chart: confluent-for-kubernetes
+        targetRevision: 0.1263.8 # 최신 버전 명시
+        helm:
+          valueFiles:
+            - "argocd/twinx/apps/confluent-operator/values.yaml"
+
+    # (Operator가 생성된 후, CRD들이 배포되도록)
+    confluent-platform:
+      enabled: true
+      namespace: confluent # 모든 컴포넌트는 confluent 네임스페이스에 배포
+      syncWave: "11"
+      source:
+        path: "argocd/twinx/apps/confluent-platform"
+
+    # (플랫폼이 완전히 준비된 후)
+    confluent-resources:
+      enabled: true
+      namespace: confluent
+      syncWave: "12"
+      source:
+        path: "argocd/twinx/apps/confluent-resources"

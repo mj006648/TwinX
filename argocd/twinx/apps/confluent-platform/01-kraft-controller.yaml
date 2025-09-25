@@ -1,0 +1,25 @@
+apiVersion: platform.confluent.io/v1beta1
+kind: KRaftController
+metadata:
+  name: kraftcontroller
+  namespace: confluent
+spec:
+  replicas: 3
+  dataVolumeCapacity: 10Gi
+  storageClass:
+    name: rook-ceph-block-kafka
+  image:
+    application: confluentinc/cp-server:7.9.2
+    init: confluentinc/confluent-init-container:2.11.2
+  podTemplate:
+    resources:
+      requests:
+        cpu: "250m"
+        memory: "1Gi"
+      limits:
+        cpu: "500m"
+        memory: "2Gi"
+  configOverrides:
+    server:
+      - metadata.log.segment.bytes=536870912
+      - metadata.log.max.retention.ms=259200000

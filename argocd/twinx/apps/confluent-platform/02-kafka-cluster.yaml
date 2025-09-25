@@ -1,0 +1,78 @@
+# 02-kafka-cluster.yaml
+
+apiVersion: platform.confluent.io/v1beta1
+kind: Kafka
+metadata:
+  name: kafka
+  namespace: confluent
+spec:
+  replicas: 3
+  dataVolumeCapacity: 100Gi # 데이터 볼륨 용량은 그대로 유지
+  storageClass:
+    name: rook-ceph-block-kafka
+  image:
+    application: confluentinc/cp-server:7.9.2
+    init: confluentinc/confluent-init-container:2.11.2
+  listeners:
+    internal:
+      name: INTERNAL
+      port: 9071
+      type: internal
+    external:
+      name: EXTERNAL
+      externalAccess:
+        type: loadBalancer
+        loadBalancer:
+          domain: minix.local
+  podTemplate:
+    resources:
+      requests:
+        cpu: "250m"
+        memory: "1Gi"
+      limits:
+        cpu: "500m"
+        memory: "2Gi"
+  dependencies:
+    kRaftController:
+      clusterRef:
+        name: kraftcontroller
+  configOverrides:
+    server:
+      # --- 기본 연결 및 복제 설정 ---
+      - "inter.broker.listener.name=INTERNAL"
+      - "listener.security.protocol.map=INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT,CONTROLLER:PLAINTEXT,REPLICATION:PLAINTEXT"
+      - "min.insync.replicas=2"
+      - "default.replication.factor=3"
+      
+      # --- Confluent 내부 토픽 복제 설정 ---
+      - "confluent.license.topic.replication.factor=3"
+      - "confluent.controlcenter.internal.topics.replication.factor=3"
+      - "confluent.controlcenter.command.topic.replication.factor=3"
+      - "confluent.monitoring.interceptor.topic.replication.factor=3"
+      - "confluent.schema.topic.replication.factor=3"
+
+      # ★★★ 일반 토픽에 대한 '기본' 보존 정책 ★★★
+      # (개별 토픽 설정이 이 값을 덮어쓸 수 있음)
+      - "log.retention.hours=12"          # 기본 12시간 보관
+      - "log.retention.bytes=536870912"     # 파티션당 최대 512MB
+      - "log.segment.bytes=134217728"     # 로그 파일 하나의 크기는 128MB
+      - "compression.type=lz4"            # 기본 압축 lz4 사용
+
+      # ★★★ 추가된 최적화: 내부 관리 토픽 보존 기간 단축 ★★★
+      # 컨슈머 그룹의 오프셋 정보를 저장하는 토픽 (__consumer_offsets)의 보존 기간을
+      # 기본 7일(10080분)에서 1일(1440분)으로 줄여 디스크 공간을 절약합니다.
+      - "offsets.topic.retention.minutes=1440"
+      # 트랜잭션 상태를 저장하는 로그(__transaction_state)의 보존 기간을
+      # 기본 7일에서 1일(86400000ms)로 줄여 디스크 공간을 절약합니다.
+      - "transaction.state.log.retention.ms=86400000"
+      
+      # ★★★ 메트릭 토픽 최적화 (기존 설정 유지) ★★★
+      - "confluent.metrics.reporter.enable=true"
+      - "confluent.metrics.reporter.topic.partitions=3"
+      - "confluent.metrics.reporter.topic.replication.factor=1" # 복제본 1로 공간 절약
+      - "confluent.metrics.reporter.topic.retention.ms=3600000" # 1시간만 보관
+      - "confluent.metrics.reporter.publish.ms=15000"
+      
+      # ★★★ 불필요한 기능 비활성화 (기존 설정 유지) ★★★
+      - "confluent.telemetry.enable=false"
+      - "confluent.self.balancing.enable=false"
