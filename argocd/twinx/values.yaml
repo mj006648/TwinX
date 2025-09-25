@@ -132,3 +132,11 @@ applications:
       # 동기화 옵션을 설정하여 서버 측에서 추가된 필드를 무시하도록 합니다.
       syncOptions:
         - ServerSideApply=true
+
+    accumulation:
+      enabled: true
+      # 이 애플리케이션이 관리하는 리소스들이 생성될 기본 네임스페이스
+      namespace: accumulation
+      syncWave: "6"
+      source:
+        path: "argocd/twinx/apps/accumulation"
