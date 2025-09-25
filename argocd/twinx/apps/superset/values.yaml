@@ -77,26 +77,15 @@ worker:
           mountPath: /opt/bitnami/superset/venv/lib/python3.10/site-packages/custom_libs
           
   #############################################################################
-  # ★★★★★ [최종 수정] Probe 초기 대기 시간을 5분으로 대폭 상향 ★★★★★
-  # Worker가 완전히 준비될 시간을 아주 넉넉하게 확보하여 Probe 실패를 방지합니다.
+  # ★★★★★ [최종 진단] Liveness & Readiness Probe를 완전히 비활성화 ★★★★★
+  # Probe 명령어 자체가 실패하는 것으로 의심되므로, 원인 진단을 위해
+  # Probe 기능을 완전히 끄고 파드가 안정적으로 실행되는지 확인합니다.
   #############################################################################
   livenessProbe:
-    enabled: true
-    # 파드가 시작되고 300초(5분) 후에 첫 Probe를 시작합니다.
-    initialDelaySeconds: 300
-    periodSeconds: 30
-    timeoutSeconds: 30
-    failureThreshold: 5
-    successThreshold: 1
+    enabled: false
 
   readinessProbe:
-    enabled: true
-    # Readiness도 동일하게 5분 대기
-    initialDelaySeconds: 300
-    periodSeconds: 30
-    timeoutSeconds: 30
-    failureThreshold: 5
-    successThreshold: 1
+    enabled: false
 
 #==============================================================================
 # 인증 및 보안 설정
@@ -113,4 +102,3 @@ postgresql:
   enabled: true
 redis:
   enabled: true
-
