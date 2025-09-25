@@ -1,0 +1,28 @@
+# accumulation/01-objectstore-claim.yaml
+apiVersion: ceph.rook.io/v1
+kind: CephObjectStore
+metadata:
+  name: iceberg-store
+  namespace: rook-ceph
+spec:
+  metadataPool:
+    failureDomain: osd  # <-- host에서 osd로 변경
+    replicated:
+      size: 1           # <-- 3에서 1로 변경 (복제 안 함)
+  dataPool:
+    failureDomain: osd  # <-- host에서 osd로 변경
+    replicated:
+      size: 1           # <-- 3에서 1로 변경 (복제 안 함)
+  gateway:
+    type: s3
+    replicas: 1         # <-- 2에서 1로 변경
+    port: 8080
+    resources:
+      requests:
+        cpu: "250m"
+        memory: "512Mi"
+      limits:
+        cpu: "500m"
+        memory: "1Gi"
+  config:
+    "rgw_frontends": "beast port=8080"
