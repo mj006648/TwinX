@@ -53,4 +53,13 @@ metadata:
         kubernetes.io/metadata.name: donghwan
     name: donghwan
 ---
+apiVersion: v1
+kind: Namespace
+metadata:
+    annotations:
+        "argocd.argoproj.io/sync-options": "Prune=false,Delete=false"
+    labels:
+        kubernetes.io/metadata.name: rook-ceph
+    name: rook-ceph
+---
 
