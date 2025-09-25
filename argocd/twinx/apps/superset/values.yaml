@@ -4,7 +4,6 @@
 # 전역(Global) 설정
 #==============================================================================
 global:
-  # Superset이 사용할 기본 스토리지 클래스를 지정합니다.
   storageClass: "rook-ceph-block"
 
 #==============================================================================
@@ -12,43 +11,9 @@ global:
 #==============================================================================
 web:
   service:
-    # 외부에서 Superset UI에 접속할 수 있도록 LoadBalancer 타입으로 서비스를 노출합니다.
     type: LoadBalancer
     ports:
-      # Superset UI 포트를 8088로 지정합니다.
       http: 8088
-  
-  # 데이터베이스 드라이버 라이브러리를 추가하기 위한 설정입니다.
-  extraEnvVars:
-    - name: PYTHONPATH
-      value: "/opt/bitnami/superset/venv/lib/python3.10/site-packages/custom_libs"
-  extraVolumes:
-    - name: custom-libs
-      emptyDir: {}
-  extraVolumeMounts:
-    - name: custom-libs
-      mountPath: /opt/bitnami/superset/venv/lib/python3.10/site-packages/custom_libs
-  initContainers:
-    - name: install-drivers
-      image: docker.io/bitnami/python:3.10
-      imagePullPolicy: IfNotPresent
-      securityContext:
-        runAsUser: 0 # pip install을 위해 root 권한으로 실행
-      command:
-        - "/bin/sh"
-        - "-c"
-        - |
-          # Trino, Hive, PostgreSQL 접속에 필요한 Python 라이브러리를 설치합니다.
-          pip install --target=/opt/bitnami/superset/venv/lib/python3.10/site-packages/custom_libs PyHive thrift-sasl psycopg2-binary trino
-      volumeMounts:
-        - name: custom-libs
-          mountPath: /opt/bitnami/superset/venv/lib/python3.10/site-packages/custom_libs
-
-#==============================================================================
-# Superset 백그라운드 워커 (Celery) 설정
-#==============================================================================
-worker:
-  # 데이터베이스 드라이버 라이브러리를 추가하기 위한 설정 (Web과 동일하게 적용)
   extraEnvVars:
     - name: PYTHONPATH
       value: "/opt/bitnami/superset/venv/lib/python3.10/site-packages/custom_libs"
@@ -68,48 +33,63 @@ worker:
         - "/bin/sh"
         - "-c"
         - |
-          # Worker에도 Web과 동일한 Python 라이브러리를 설치합니다.
+          pip install --target=/opt/bitnami/superset/venv/lib/python3.10/site-packages/custom_libs PyHive thrift-sasl psycopg2-binary trino
+      volumeMounts:
+        - name: custom-libs
+          mountPath: /opt/bitnami/superset/venv/lib/python3.10/site-packages/custom_libs
+
+#==============================================================================
+# Superset 백그라운드 워커 (Celery) 설정
+#==============================================================================
+worker:
+  # ★★★★★ [핵심 수정] 메모리 부족(OOMKilled) 문제 해결을 위해 리소스 대폭 상향 ★★★★★
+  resources:
+    requests:
+      cpu: "1"
+      memory: "4Gi" # 요청 메모리도 넉넉하게
+    limits:
+      cpu: "2"
+      memory: "8Gi" # 한도 메모리를 8Gi로 대폭 상향
+
+  # 데이터베이스 드라이버 라이브러리를 추가하기 위한 설정
+  extraEnvVars:
+    - name: PYTHONPATH
+      value: "/opt/bitnami/superset/venv/lib/python3.10/site-packages/custom_libs"
+  extraVolumes:
+    - name: custom-libs
+      emptyDir: {}
+  extraVolumeMounts:
+    - name: custom-libs
+      mountPath: /opt/bitnami/superset/venv/lib/python3.10/site-packages/custom_libs
+  initContainers:
+    - name: install-drivers
+      image: docker.io/bitnami/python:3.10
+      imagePullPolicy: IfNotPresent
+      securityContext:
+        runAsUser: 0
+      command:
+        - "/bin/sh"
+        - "-c"
+        - |
           pip install --target=/opt/bitnami/superset/venv/lib/python3.10/site-packages/custom_libs PyHive thrift-sasl psycopg2-binary trino
       volumeMounts:
         - name: custom-libs
           mountPath: /opt/bitnami/superset/venv/lib/python3.10/site-packages/custom_libs
           
-  #############################################################################
-  # ★★★★★ [핵심 수정] Worker CrashLoopBackOff 문제 해결을 위한 Probe 설정 ★★★★★
-  # Superset Worker는 웹 서버가 없으므로 HTTP Probe가 아닌, 
-  # Celery 프로세스의 상태를 직접 확인하는 Command Probe를 사용해야 합니다.
-  #############################################################################
+  # Probe 설정은 그대로 유지 (이미 최신 차트의 올바른 설정이 적용됨)
   livenessProbe:
     enabled: true
-    exec:
-      # 'celery status' 명령어를 실행하여 워커 프로세스가 살아있는지 확인합니다.
-      command:
-        - celery
-        - -A
-        - superset.tasks.celery_app:app
-        - status
-    # 파드가 시작되고 60초 후에 첫 Probe를 시작합니다.
-    initialDelaySeconds: 60
-    # 30초마다 Probe를 실행합니다.
+    initialDelaySeconds: 120 # 초기 대기 시간을 2분으로 늘려 안정성 확보
     periodSeconds: 30
-    # Probe 명령어가 10초 안에 응답이 없으면 실패로 간주합니다.
-    timeoutSeconds: 10
-    # 5번 연속 실패하면 파드를 비정상으로 간주하고 재시작합니다.
+    timeoutSeconds: 20
     failureThreshold: 5
     successThreshold: 1
 
   readinessProbe:
     enabled: true
-    exec:
-      # Readiness도 동일한 명령어로 확인하여 워커가 작업을 받을 준비가 되었는지 확인합니다.
-      command:
-        - celery
-        - -A
-        - superset.tasks.celery_app:app
-        - status
-    initialDelaySeconds: 60
+    initialDelaySeconds: 120
     periodSeconds: 30
-    timeoutSeconds: 10
+    timeoutSeconds: 20
     failureThreshold: 5
     successThreshold: 1
 
@@ -117,19 +97,14 @@ worker:
 # 인증 및 보안 설정
 #==============================================================================
 auth:
-  # Superset 초기 관리자 계정 설정
   username: "admin"
   password: "admin"
-  # 암호화를 위한 시크릿 키 (반드시 유지 또는 변경)
   secretKey: 'p5gXv7yB9dE3fH2jL4mN6qR8tV0wZxC3bA1sF5uI7oK+Gg=='
 
 #==============================================================================
 # 의존성 서비스 설정 (Bitnami 하위 차트)
 #==============================================================================
-# Superset 메타데이터 저장을 위한 PostgreSQL을 활성화합니다.
 postgresql:
   enabled: true
-
-# Celery 메시지 브로커 및 결과 저장을 위한 Redis를 활성화합니다.
 redis:
   enabled: true
