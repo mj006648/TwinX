@@ -245,7 +245,6 @@ applications:
       source:
         path: "argocd/twinx/apps/job-schedules"
 
-
     superset:
       enabled: true
       namespace: superset
