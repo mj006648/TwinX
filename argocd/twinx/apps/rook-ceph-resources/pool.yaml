@@ -1,6 +1,14 @@
-# apps/rook-ceph-resources/pool.yaml
+# 
+# ==============================================================================
+#      경고: 이 YAML 파일은 단일 노드 클러스터 전용으로 수정되었습니다.
+#      - 모든 데이터 복제본(replicated.size) 수가 1로 설정되어 있습니다.
+#      - 데이터가 복제되지 않으므로, 노드 장애 시 데이터가 영구 손실됩니다.
+#      - 절대로 프로덕션(운영) 환경에서 사용하지 마십시오.
+# ==============================================================================
+#
 
-# 1. 블록 스토리지 풀
+# 1. 블록 스토리지 풀 (Block Storage Pool)
+# PersistentVolumeClaim (PVC)을 통해 파드에 블록 디바이스를 제공하는 데 사용됩니다. (예: PostgreSQL 데이터베이스 볼륨)
 apiVersion: ceph.rook.io/v1
 kind: CephBlockPool
 metadata:
@@ -9,23 +17,69 @@ metadata:
 spec:
   failureDomain: host
   replicated:
-    size: 3
+    # 단일 노드 환경이므로 복제본 수를 1로 설정합니다.
+    size: 1
 ---
-# 2. 파일 시스템 (메타데이터 풀과 데이터 풀 포함)
+# 2. 파일 시스템 (Filesystem)
+# 여러 파드가 동시에 읽고 쓸 수 있는 공유 파일 시스템(ReadWriteMany)을 제공합니다.
 apiVersion: ceph.rook.io/v1
 kind: CephFilesystem
 metadata:
   name: myfs
   namespace: rook-ceph
 spec:
+  # 파일 시스템의 메타데이터를 저장하는 풀입니다.
   metadataPool:
     replicated:
-      size: 3
+      # 단일 노드 환경이므로 복제본 수를 1로 설정합니다.
+      size: 1
+  # 파일 시스템의 실제 데이터를 저장하는 풀입니다.
   dataPools:
     - name: replicated
       replicated:
-        size: 3
+        # 단일 노드 환경이므로 복제본 수를 1로 설정합니다.
+        size: 1
+  # 이 CephFilesystem 리소스를 삭제해도 실제 데이터는 보존하도록 설정합니다.
   preserveFilesystemOnDelete: true
+  # 메타데이터 서버(MDS) 설정입니다.
   metadataServer:
     activeCount: 1
     activeStandby: true
+---
+# 3. 오브젝트 스토리지 (Object Store - RGW)
+# S3 호환 API를 제공하는 오브젝트 스토리지를 생성합니다. (예: Iceberg 데이터 저장소)
+apiVersion: ceph.rook.io/v1
+kind: CephObjectStore
+metadata:
+  name: my-store
+  namespace: rook-ceph
+spec:
+  # 오브젝트 스토어의 메타데이터(버킷 정보 등)를 저장할 풀입니다.
+  metadataPool:
+    failureDomain: host
+    replicated:
+      # 단일 노드 환경이므로 복제본 수를 1로 설정합니다.
+      size: 1
+  # 오브젝트 스토어의 실제 데이터(객체)를 저장할 풀입니다.
+  dataPool:
+    failureDomain: host
+    replicated:
+      # 단일 노드 환경이므로 복제본 수를 1로 설정합니다.
+      size: 1
+  
+  # RGW 데몬(S3 API 요청을 처리하는 서버) 설정입니다.
+  gateway:
+    type: s3
+    # 단일 노드에서는 게이트웨이도 1개면 충분합니다.
+    replicas: 1
+    port: 8080
+    resources:
+      requests:
+        cpu: "250m"
+        memory: "512Mi"
+      limits:
+        cpu: "500m"
+        memory: "1Gi"
+  # RGW 프론트엔드 설정입니다. (기존 설정 유지)
+  config:
+    "rgw_frontends": "beast port=8080"
