@@ -100,5 +100,13 @@ auth:
 #==============================================================================
 postgresql:
   enabled: true
+  ### [수정] PostgreSQL 인증 정보 추가 ###
+  # 이 부분을 추가하여 데이터베이스 사용자, 암호, 데이터베이스 이름을 고정합니다.
+  auth:
+    username: "bn_superset"          # 로그에 나온 사용자 이름
+    password: "superset-password"    # 쉬운 비밀번호 설정
+    database: "bitnami_superset"     # 사용할 데이터베이스 이름
+    postgresPassword: "postgres-password" # PostgreSQL 루트(admin) 비밀번호 설정
+
 redis:
   enabled: true
