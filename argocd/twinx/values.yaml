@@ -140,3 +140,17 @@ applications:
       syncWave: "6"
       source:
         path: "argocd/twinx/apps/accumulation"
+
+    postgresql:
+      enabled: true
+      namespace: postgre
+      syncWave: "7"
+      source:
+        type: helm
+        repoURL: https://charts.bitnami.com/bitnami
+        chart: postgresql
+        #-- 안정적인 배포를 위해 차트 버전을 명시합니다.
+        targetRevision: "16.7.27"
+        helm:
+          valueFiles:
+            - "argocd/twinx/apps/postgresql/values.yaml"
