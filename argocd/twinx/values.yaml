@@ -156,7 +156,7 @@ applications:
             - "argocd/twinx/apps/postgresql/values.yaml"
 
     nessie:
-      enabled: false
+      enabled: true
       namespace: nessie-ns
       syncWave: "8" # PostgreSQL 이후에 배포되도록 설정
       source:
