@@ -142,7 +142,7 @@ applications:
         path: "argocd/twinx/apps/accumulation"
 
     postgresql:
-      enabled: true
+      enabled: false
       namespace: postgre
       syncWave: "7"
       source:
@@ -156,7 +156,7 @@ applications:
             - "argocd/twinx/apps/postgresql/values.yaml"
 
     nessie:
-      enabled: true
+      enabled: false
       namespace: nessie-ns
       syncWave: "8" # PostgreSQL 이후에 배포되도록 설정
       source:
@@ -172,7 +172,7 @@ applications:
         - CreateNamespace=true # ArgoCD가 네임스페이스를 자동으로 생성
 
     nessie-resources:
-      enabled: true
+      enabled: false
       namespace: nessie-ns
       syncWave: "9" # nessie Helm 차트와 동시에 배포
       source:
@@ -231,7 +231,7 @@ applications:
 
     # Wave 15: Spark 잡을 위한 RBAC, Secret 및 스크립트 ConfigMap
     spark-job-configs:
-      enabled: true
+      enabled: false
       namespace: spark-operator
       syncWave: "14"
       source:
@@ -239,7 +239,7 @@ applications:
 
     # Wave 16: 모든 Spark 애플리케이션(현재는 스트리밍 잡 하나)을 관리
     spark-applications: # (기존 spark-job-schedules에서 이름 변경)
-      enabled: true
+      enabled: false
       namespace: spark-operator
       syncWave: "15"
       source:
@@ -264,7 +264,7 @@ applications:
         - CreateNamespace=true # ArgoCD가 'superset' 네임스페이스를 자동으로 생성
 
     trino:
-      enabled: true
+      enabled: false
       namespace: trino # Trino 컴포넌트를 설치할 네임스페이스
       syncWave: "20"
       source:

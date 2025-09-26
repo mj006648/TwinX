@@ -1,5 +1,5 @@
 # FILE: argocd/twinx/apps/job-configs/02-scripts-configmap.yaml
-# 최종 버전: ingestion/merge 잡의 모든 논리적 문제를 해결하고 안정성을 극대화한 완전한 코드
+# [최종 수정 버전] Kafka 접속 정보 및 데이터 검증/병합 로직을 모두 수정했습니다.
 
 apiVersion: v1
 kind: ConfigMap
@@ -11,13 +11,15 @@ data:
   dynamic_ingestion.py: |
     import os
     from pyspark.sql import SparkSession
-    from pyspark.sql.functions import col, lit, struct, to_json, current_timestamp, when
+    # ★★★ coalesce 함수를 사용하기 위해 import 목록에 추가 ★★★
+    from pyspark.sql.functions import col, lit, struct, to_json, current_timestamp, when, coalesce
     from pyspark.sql.utils import AnalysisException
 
     S3_ENDPOINT = os.environ.get("S3_ENDPOINT")
     S3_ACCESS_KEY = os.environ.get("S3_ACCESS_KEY")
     S3_SECRET_KEY = os.environ.get("S3_SECRET_KEY")
     NESSIE_URI = "http://nessie.nessie-ns.svc:19120/api/v1"
+    # ★★★ Kafka 접속 정보를 내부 리스너로 변경 ★★★
     KAFKA_BOOTSTRAP_SERVERS = "kafka.confluent.svc:9071"
     WAREHOUSE_PATH = "s3a://iceberg-data/warehouse"
 
@@ -58,6 +60,9 @@ data:
                 return False
                 
             json_df = spark.read.json(json_rdd).cache()
+            if json_df.rdd.isEmpty():
+                print("No data in this batch to infer schema. Onboarding will be retried.")
+                return False
             
             spark.sql("USE REFERENCE main IN nessie")
             
@@ -99,8 +104,9 @@ data:
             print(f"🔥 ERROR during onboarding for topic {topic_name}: {e}")
             return False
         finally:
+            if 'json_df' in locals() and json_df.is_cached:
+                json_df.unpersist()
             spark.catalog.dropTempView("temp_schema_view_onboarding")
-            json_df.unpersist()
 
     def process_ingestion_logic(spark, micro_batch_df):
         if micro_batch_df.rdd.isEmpty(): return
@@ -129,10 +135,17 @@ data:
                 json_df = spark.read.json(json_rdd)
                 original_columns = json_df.columns
                 
-                if "timestamp" in json_df.columns:
+                if "timestamp" in original_columns:
                     json_df = json_df.withColumn("timestamp", col("timestamp").cast("timestamp"))
                     
-                validated_df = json_df.withColumn("validation_error", when(col("eventId").isNull(), "eventId is null").otherwise(lit(None)))
+                # ★★★ 모든 컬럼의 null 값을 검사하는 새로운 로직으로 변경 ★★★
+                error_conditions = [when(col(c).isNull(), lit(f"{c} is null")) for c in original_columns]
+                
+                validated_df = json_df.withColumn(
+                    "validation_error",
+                    coalesce(*error_conditions)
+                )
+
                 trusted_df = validated_df.filter(col("validation_error").isNull())
                 untrusted_df = validated_df.filter(col("validation_error").isNotNull())
 
@@ -141,7 +154,7 @@ data:
                     print(f"✅ Appended {trusted_df.count()} trusted rows to '{dev_branch_name}'.")
                 
                 if not untrusted_df.rdd.isEmpty():
-                    untrusted_df.withColumn("raw_payload", to_json(struct([c for c in original_columns]))) \
+                    untrusted_df.withColumn("raw_payload", to_json(struct([col(c) for c in original_columns]))) \
                         .select("raw_payload", "validation_error").withColumn("processing_timestamp", current_timestamp()) \
                         .writeTo(f"nessie.`{staging_namespace}`.`{untrusted_table}`").append()
                     print(f"✅ Appended {untrusted_df.count()} untrusted rows to '{dev_branch_name}'.")
@@ -229,33 +242,43 @@ data:
 
                 print(f"\n--- Processing branch: {dev_branch} ---")
 
-                # 1. 소스 데이터가 있는 dev 브랜치로 컨텍스트 전환
-                print(f"Switching to source branch: {dev_branch}")
                 spark.sql(f"USE REFERENCE `{dev_branch}` IN nessie")
                 
-                # 2. 소스 테이블을 읽어 임시 뷰 생성
                 source_df = spark.read.table(staging_table_fqn)
                 if source_df.rdd.isEmpty():
                     print(f"No new data to merge in branch '{dev_branch}'. Skipping.")
                     continue
                 
+                # ★★★ MERGE에 사용할 고유 키(PK) 정의 ★★★
+                # 데이터에 고유 식별자가 없으므로, 데이터의 특성을 고려하여 고유성을 보장할 키 조합을 찾습니다.
+                # 예: 시계열 데이터의 경우 (측정 대상, 측정 항목, 시간) 조합이 고유할 수 있습니다.
+                # 아래는 예시이며, 실제 데이터에 맞게 수정해야 합니다.
+                primary_keys = ["hostname", "metric_name", "timestamp"]
+                
+                # MERGE ON 조건절을 동적으로 생성
+                merge_on_condition = " AND ".join([f"t.{key} = s.{key}" for key in primary_keys])
+
                 source_df.createOrReplaceTempView("source_view_for_merge")
                 print(f"Created temporary view with {source_df.count()} rows.")
 
-                # 3. 타겟 데이터가 있는 main 브랜치로 다시 컨텍스트 전환
-                print("Switching back to target branch: main")
                 spark.sql("USE REFERENCE main IN nessie")
 
-                # 4. 이제 main 컨텍스트에서 MERGE 실행
+                # ★★★ eventId가 없는 데이터를 처리하기 위해 MERGE 기준을 동적으로 변경 ★★★
                 merge_sql = f"""
                 MERGE INTO {prod_table_fqn} t
                 USING source_view_for_merge s
-                ON t.eventId = s.eventId
+                ON {merge_on_condition}
                 WHEN NOT MATCHED THEN INSERT *
                 """
                 print(f"Executing MERGE for {prod_table_fqn}...")
                 spark.sql(merge_sql)
                 print(f"✅ Successfully merged data from '{dev_branch}' to 'main'.")
+
+                # (선택적) 머지가 완료된 후 dev 브랜치의 스테이징 테이블 비우기
+                # print(f"Truncating staging table in branch '{dev_branch}'...")
+                # spark.sql(f"USE REFERENCE `{dev_branch}` IN nessie")
+                # spark.sql(f"TRUNCATE TABLE {staging_table_fqn}")
+                # print("✅ Staging table truncated.")
 
             except Exception as e:
                 print(f"🔥 ERROR: Failed to process branch {dev_branch}. Reason: {e}")
@@ -266,4 +289,3 @@ data:
 
     if __name__ == "__main__":
         main()
-
