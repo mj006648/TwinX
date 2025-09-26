@@ -142,7 +142,7 @@ applications:
         path: "argocd/twinx/apps/accumulation"
 
     postgresql:
-      enabled: false
+      enabled: true
       namespace: postgre
       syncWave: "7"
       source:
