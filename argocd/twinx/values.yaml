@@ -246,7 +246,7 @@ applications:
         path: "argocd/twinx/apps/job-schedules"
 
     superset:
-      enabled: false
+      enabled: true
       namespace: superset
       syncWave: "19" # 다른 모든 인프라가 준비된 후 배포
       source:
