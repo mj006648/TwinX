@@ -231,7 +231,7 @@ applications:
 
     # Wave 15: Spark 잡을 위한 RBAC, Secret 및 스크립트 ConfigMap
     spark-job-configs:
-      enabled: false
+      enabled: true
       namespace: spark-operator
       syncWave: "14"
       source:
@@ -239,7 +239,7 @@ applications:
 
     # Wave 16: 모든 Spark 애플리케이션(현재는 스트리밍 잡 하나)을 관리
     spark-applications: # (기존 spark-job-schedules에서 이름 변경)
-      enabled: false
+      enabled: true
       namespace: spark-operator
       syncWave: "15"
       source:
@@ -264,7 +264,7 @@ applications:
         - CreateNamespace=true # ArgoCD가 'superset' 네임스페이스를 자동으로 생성
 
     trino:
-      enabled: false
+      enabled: true
       namespace: trino # Trino 컴포넌트를 설치할 네임스페이스
       syncWave: "20"
       source:

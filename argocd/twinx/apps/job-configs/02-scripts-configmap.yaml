@@ -1,5 +1,5 @@
 # FILE: argocd/twinx/apps/job-configs/02-scripts-configmap.yaml
-# [최종 수정 버전] Kafka 접속 정보 및 데이터 검증/병합 로직을 모두 수정했습니다.
+# [최종 완전판] Kafka 접속, Null 값 검증, 스키마 충돌 방지, 동적 MERGE 로직이 모두 반영된 코드입니다.
 
 apiVersion: v1
 kind: ConfigMap
@@ -138,28 +138,37 @@ data:
                 if "timestamp" in original_columns:
                     json_df = json_df.withColumn("timestamp", col("timestamp").cast("timestamp"))
                     
-                # ★★★ 모든 컬럼의 null 값을 검사하는 새로운 로직으로 변경 ★★★
+                # 1. 1차 검증: Null 값 검사
                 error_conditions = [when(col(c).isNull(), lit(f"{c} is null")) for c in original_columns]
+                validated_df = json_df.withColumn("validation_error", coalesce(*error_conditions))
                 
-                validated_df = json_df.withColumn(
-                    "validation_error",
-                    coalesce(*error_conditions)
-                )
-
                 trusted_df = validated_df.filter(col("validation_error").isNull())
-                untrusted_df = validated_df.filter(col("validation_error").isNotNull())
+                initial_untrusted_df = validated_df.filter(col("validation_error").isNotNull())
 
+                # 2. 2차 검증: trusted 데이터를 실제 테이블에 써보고 스키마 충돌 검사
+                failed_to_write_df = None
                 if not trusted_df.rdd.isEmpty():
-                    trusted_df.select(original_columns).writeTo(f"nessie.`{staging_namespace}`.`{trusted_table}`").append()
-                    print(f"✅ Appended {trusted_df.count()} trusted rows to '{dev_branch_name}'.")
-                
-                if not untrusted_df.rdd.isEmpty():
-                    untrusted_df.withColumn("raw_payload", to_json(struct([col(c) for c in original_columns]))) \
+                    try:
+                        trusted_df.select(original_columns).writeTo(f"nessie.`{staging_namespace}`.`{trusted_table}`").append()
+                        print(f"✅ Appended {trusted_df.count()} trusted rows to '{dev_branch_name}'.")
+                    except Exception as e:
+                        print(f"⚠️ FAILED TO APPEND trusted data due to schema mismatch or other write error. Sending to untrusted. Error: {e}")
+                        failed_to_write_df = trusted_df.withColumn("validation_error", lit(f"Write Failure: {str(e)}"))
+
+                # 3. untrusted 데이터 통합 및 저장
+                final_untrusted_df = initial_untrusted_df
+                if failed_to_write_df is not None:
+                    final_untrusted_df = final_untrusted_df.unionByName(failed_to_write_df, allowMissingColumns=True)
+
+                if not final_untrusted_df.rdd.isEmpty():
+                    untrusted_rows_count = final_untrusted_df.count()
+                    final_untrusted_df.withColumn("raw_payload", to_json(struct([col(c) for c in original_columns]))) \
                         .select("raw_payload", "validation_error").withColumn("processing_timestamp", current_timestamp()) \
                         .writeTo(f"nessie.`{staging_namespace}`.`{untrusted_table}`").append()
-                    print(f"✅ Appended {untrusted_df.count()} untrusted rows to '{dev_branch_name}'.")
+                    print(f"✅ Appended {untrusted_rows_count} untrusted rows to '{dev_branch_name}'.")
+
             except Exception as e:
-                print(f"🔥 FAILED TO WRITE DATA for topic {topic_name}. REAL ERROR: {e}")
+                print(f"🔥 A CRITICAL ERROR occurred in ingestion logic for topic {topic_name}. REAL ERROR: {e}")
 
     def foreach_batch_wrapper(df, batch_id):
         print(f"--- Processing Batch ID: {batch_id} ---")
