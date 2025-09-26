@@ -1,0 +1,143 @@
+# 03-maintenance-configmap.yaml
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: spark-maintenance-scripts
+  namespace: spark-operator
+data:
+  daily_table_maintenance.py: |
+    import os
+    from pyspark.sql import SparkSession
+    from pyspark.sql.functions import col, regexp_replace
+    from datetime import date, timedelta
+
+    S3_ENDPOINT = os.environ.get("S3_ENDPOINT")
+    S3_ACCESS_KEY = os.environ.get("S3_ACCESS_KEY")
+    S3_SECRET_KEY = os.environ.get("S3_SECRET_KEY")
+    NESSIE_URI = "http://nessie.nessie-ns.svc:19120/api/v1"
+    WAREHOUSE_PATH = "s3a://iceberg-data/warehouse"
+
+    def get_spark_session():
+        builder = (
+            SparkSession.builder.appName("DailyTableMaintenance")
+            .config("spark.jars.packages", "org.apache.iceberg:iceberg-spark-runtime-3.5_2.12:1.9.0,org.projectnessie.nessie-integrations:nessie-spark-extensions-3.5_2.12:0.103.3,org.apache.hadoop:hadoop-aws:3.3.4,com.amazonaws:aws-java-sdk-bundle:1.12.262")
+            .config("spark.sql.extensions", "org.apache.iceberg.spark.extensions.IcebergSparkSessionExtensions,org.projectnessie.spark.extensions.NessieSparkSessionExtensions")
+            .config("spark.sql.catalog.nessie", "org.apache.iceberg.spark.SparkCatalog")
+            .config("spark.sql.catalog.nessie.catalog-impl", "org.apache.iceberg.nessie.NessieCatalog")
+            .config("spark.sql.catalog.nessie.uri", NESSIE_URI)
+            .config("spark.sql.catalog.nessie.warehouse", WAREHOUSE_PATH)
+            .config("spark.sql.catalog.nessie.ref", "main")
+            .config("spark.sql.defaultCatalog", "nessie")
+        )
+        if S3_ENDPOINT: builder.config("spark.hadoop.fs.s3a.endpoint", S3_ENDPOINT)
+        if S3_ACCESS_KEY: builder.config("spark.hadoop.fs.s3a.access.key", S3_ACCESS_KEY)
+        if S3_SECRET_KEY: builder.config("spark.hadoop.fs.s3a.secret.key", S3_SECRET_KEY)
+        builder.config("spark.hadoop.fs.s3a.path.style.access", "true")
+        builder.config("spark.hadoop.fs.s3a.connection.ssl.enabled", "false")
+        builder.config("spark.hadoop.fs.s3a.impl", "org.apache.hadoop.fs.s3a.S3AFileSystem")
+        return builder.getOrCreate()
+
+    def get_all_prod_tables(spark):
+        print("--- Step 1: Switch to 'main' branch context ---")
+        try:
+            spark.sql("USE BRANCH main IN nessie")
+            print("✅ Successfully switched to 'main' branch.")
+        except Exception as e:
+            print(f"🔥🔥🔥 FAILURE: Could not switch to main branch. Error: {e}")
+            return []
+
+        print("\n--- Step 2: Show all namespaces on 'main' branch ---")
+        try:
+            namespaces_df = spark.sql("SHOW NAMESPACES IN nessie")
+            print("✅ SHOW NAMESPACES command successful. DataFrame contents:")
+            namespaces_df.show(truncate=False)
+        except Exception as e:
+            print(f"🔥🔥🔥 FAILURE: Could not list namespaces. Error: {e}")
+            return []
+
+        print("\n--- Step 3: Filter for namespaces ending with '_prod' (removing backticks) ---")
+        try:
+            ns_clean_df = namespaces_df.withColumn("ns_clean", regexp_replace(col("namespace"), "`", ""))
+            prod_namespaces_df = ns_clean_df.filter(col("ns_clean").rlike(r".*_prod$"))
+            print("✅ Filtering successful. Filtered DataFrame contents:")
+            prod_namespaces_df.select("namespace", "ns_clean").show(truncate=False)
+            prod_namespaces_list = [row.ns_clean for row in prod_namespaces_df.collect()]
+            print(f"\n✅ Converted to Python list: {prod_namespaces_list}")
+        except Exception as e:
+            print(f"🔥🔥🔥 FAILURE: Could not filter namespaces. Error: {e}")
+            return []
+
+        print("\n--- Step 4: Iterate through found namespaces and list tables ---")
+        try:
+            all_tables = []
+            for ns in prod_namespaces_list:
+                print(f"\n  - Checking tables inside namespace: {ns}")
+                tables_df = spark.sql(f"SHOW TABLES IN nessie.`{ns}`")
+                for row in tables_df.collect():
+                    if not row.tableName.endswith("_untrusted"):
+                        full_table_name = f"nessie.`{ns}`.`{row.tableName}`"
+                        print(f"    - Found valid table, adding to list: {full_table_name}")
+                        all_tables.append(full_table_name)
+            return all_tables
+        except Exception as e:
+            print(f"🔥🔥🔥 FAILURE: An error occurred while listing tables. Error: {e}")
+            return []
+
+    def main():
+        spark = get_spark_session()
+        print("--- Starting Daily Table Maintenance Job ---")
+        prod_tables = get_all_prod_tables(spark)
+        if not prod_tables:
+            print("No production tables to maintain. Exiting.")
+            spark.stop()
+            return
+
+        print("\n" + "="*50)
+        print("--- FINAL RESULT ---")
+        print(f"✅ Successfully discovered the following production tables:")
+        print(prod_tables)
+        print("="*50)
+
+        older_than_timestamp_str = (date.today() - timedelta(days=3)).strftime('%Y-%m-%d %H:%M:%S')
+        yesterday = date.today() - timedelta(days=1)
+        day_before_yesterday = date.today() - timedelta(days=2)
+        # ❗️❗️❗️ 여기가 수정된 부분입니다 ❗️❗️❗️
+        compaction_where_clause = f"timestamp >= timestamp \"{day_before_yesterday}\" AND timestamp < timestamp \"{yesterday}\""
+
+        for table in prod_tables:
+            print(f"\n--- Maintaining table: {table} ---")
+            try:
+                print("0. Ensuring GC is enabled on the table...")
+                spark.sql(f"ALTER TABLE {table} SET TBLPROPERTIES ('gc.enabled' = 'true')")
+                print("✅ GC is enabled.")
+
+                print(f"1. Removing orphan files older than {older_than_timestamp_str}...")
+                spark.sql(f"CALL system.remove_orphan_files(table => '{table}', older_than => TIMESTAMP '{older_than_timestamp_str}', dry_run => false)")
+                print("✅ Orphan files removed.")
+
+                print(f"2. Rewriting data files (binpack) where: {compaction_where_clause}")
+                spark.sql(f"""
+                    CALL system.rewrite_data_files(
+                        table => '{table}',
+                        strategy => 'binpack',
+                        where => '{compaction_where_clause}',
+                        options => map('target-file-size-bytes','536870912', 'max-file-group-size-bytes','10737418240')
+                    )
+                """)
+                print("✅ Data files compacted.")
+
+                print("3. Rewriting manifests as a final step...")
+                spark.sql(f"CALL system.rewrite_manifests(table => '{table}', use_caching => false)")
+                print("✅ Manifests rewritten.")
+
+            except Exception as e:
+                print(f"🔥 ERROR: Failed to maintain table {table}. Reason: {e}")
+                continue
+        
+        print("\n--- Daily Table Maintenance Job Finished ---")
+        spark.stop()
+
+    if __name__ == "__main__":
+        main()
+
