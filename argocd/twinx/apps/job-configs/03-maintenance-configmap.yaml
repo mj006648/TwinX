@@ -1,5 +1,3 @@
-# 03-maintenance-configmap.yaml
-
 apiVersion: v1
 kind: ConfigMap
 metadata:

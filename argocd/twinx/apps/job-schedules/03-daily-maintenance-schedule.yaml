@@ -14,13 +14,13 @@ spec:
     type: Python
     mode: cluster
     image: "ich6648/spark-iceberg-nessie-kafka:9.0"
-    imagePullPolicy: Always# spark-operator/values.yaml
-# SparkApplication 리소스를 감시하고 잡을 실행할 네임스페이스 지정
-sparkJobNamespace: "spark-operator"
-# Webhook 활성화
-webhook:
-  enable: true
-
+    imagePullPolicy: Always
+    # ------------------- 여기부터 수정됨 -------------------
+    # 아래의 잘못된 위치에 있던 설정들을 삭제했습니다.
+    # sparkJobNamespace: "spark-operator"
+    # webhook:
+    #   enable: true
+    # -----------------------------------------------------
     mainApplicationFile: "local:///mnt/scripts/daily_table_maintenance.py"
     sparkVersion: "3.5.0"
     restartPolicy:
@@ -71,4 +71,3 @@ webhook:
       - name: scripts-volume
         configMap:
           name: spark-maintenance-scripts
-
