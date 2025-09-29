@@ -5,7 +5,7 @@ server:
   persistentVolume:
     enabled: true
     size: "10Gi"
-    storageClass: "nfs-dx-ssd-a"
+    storageClass: "rook-ceph-block"
   resources:
     requests:
       cpu: "200m"
