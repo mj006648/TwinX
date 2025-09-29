@@ -5,6 +5,7 @@
 # OS에 직접 드라이버를 설치하지 않았다면 반드시 true로 설정해야 합니다.
 driver:
   enabled: true
+  useHostDriver: true
 
 # toolkit: NVIDIA Container Toolkit을 설치할지 여부입니다.
 # 컨테이너가 GPU를 인식하고 사용하려면 필수적입니다.

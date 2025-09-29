@@ -28,7 +28,7 @@ applications:
         path: "argocd/twinx/apps/metallb-resources"
    
     gpu-operator:
-      enabled: true
+      enabled: false
       namespace: gpu-operator # Operator와 관련 컴포넌트를 설치할 네임스페이스
       syncWave: "2"
       source:
@@ -258,7 +258,7 @@ applications:
 
     # Wave 16: 모든 Spark 애플리케이션(현재는 스트리밍 잡 하나)을 관리
     spark-applications: # (기존 spark-job-schedules에서 이름 변경)
-      enabled: false
+      enabled: true
       namespace: spark-operator
       syncWave: "16"
       source:
