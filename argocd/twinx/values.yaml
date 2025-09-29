@@ -161,7 +161,7 @@ applications:
         path: "argocd/twinx/apps/accumulation"
 
     postgresql:
-      enabled: true
+      enabled: false
       namespace: postgre
       syncWave: "8"
       source:
@@ -175,7 +175,7 @@ applications:
             - "argocd/twinx/apps/postgresql/values.yaml"
 
     nessie:
-      enabled: true
+      enabled: false
       namespace: nessie-ns
       syncWave: "9" # PostgreSQL 이후에 배포되도록 설정
       source:
@@ -191,7 +191,7 @@ applications:
         - CreateNamespace=true # ArgoCD가 네임스페이스를 자동으로 생성
 
     nessie-resources:
-      enabled: true
+      enabled: false
       namespace: nessie-ns
       syncWave: "10" # nessie Helm 차트와 동시에 배포
       source:
