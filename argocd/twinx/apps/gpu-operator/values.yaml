@@ -1,0 +1,33 @@
+# FILE: argocd/twinx/apps/gpu-operator/values.yaml
+# NVIDIA GPU Operator의 핵심 설정을 정의합니다.
+
+# driver: GPU 드라이버 컨테이너를 설치할지 여부입니다.
+# OS에 직접 드라이버를 설치하지 않았다면 반드시 true로 설정해야 합니다.
+driver:
+  enabled: true
+
+# toolkit: NVIDIA Container Toolkit을 설치할지 여부입니다.
+# 컨테이너가 GPU를 인식하고 사용하려면 필수적입니다.
+toolkit:
+  enabled: true
+
+# nfd: Node Feature Discovery (노드 특징 발견)
+# Operator가 GPU 노드를 식별하기 위해 사용하는 컴포넌트입니다.
+# 클러스터에 NFD가 이미 설치되어 있지 않다면 true로 설정하여 Operator가 직접 설치하도록 합니다.
+nfd:
+  enabled: true
+
+# mig: Multi-Instance GPU (하나의 GPU를 여러 개로 쪼개 쓰는 기술)
+# A100 같은 최신 GPU에서 사용합니다. single은 파티셔닝하지 않음을 의미합니다.
+mig:
+  strategy: single
+
+# dcgmExporter: GPU 메트릭 수집기 (Prometheus 용)
+# GPU 모니터링을 위해 활성화하는 것이 좋습니다.
+dcgmExporter:
+  enabled: true
+
+# cdi: Container Device Interface
+# 컨테이너에 GPU 장치를 노출하는 표준화된 방식입니다. 최신 버전에서 권장됩니다.
+cdi:
+  enabled: true
