@@ -9,7 +9,7 @@ driver:
 # toolkit: NVIDIA Container Toolkit을 설치할지 여부입니다.
 # 컨테이너가 GPU를 인식하고 사용하려면 필수적입니다.
 toolkit:
-  enabled: false
+  enabled: true
 
 # nfd: Node Feature Discovery (노드 특징 발견)
 # Operator가 GPU 노드를 식별하기 위해 사용하는 컴포넌트입니다.
