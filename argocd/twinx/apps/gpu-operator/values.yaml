@@ -4,13 +4,12 @@
 # driver: GPU 드라이버 컨테이너를 설치할지 여부입니다.
 # OS에 직접 드라이버를 설치하지 않았다면 반드시 true로 설정해야 합니다.
 driver:
-  enabled: true
-  useHostDriver: true
+  enabled: false
 
 # toolkit: NVIDIA Container Toolkit을 설치할지 여부입니다.
 # 컨테이너가 GPU를 인식하고 사용하려면 필수적입니다.
 toolkit:
-  enabled: true
+  enabled: false
 
 # nfd: Node Feature Discovery (노드 특징 발견)
 # Operator가 GPU 노드를 식별하기 위해 사용하는 컴포넌트입니다.
