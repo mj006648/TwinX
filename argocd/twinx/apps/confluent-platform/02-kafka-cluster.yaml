@@ -20,10 +20,20 @@ spec:
       type: internal
     external:
       name: EXTERNAL
+      # ★★★ [최종 수정] LoadBalancer를 NodePort 방식으로 변경 ★★★
       externalAccess:
-        type: loadBalancer
-        loadBalancer:
-          domain: twinx.local
+        type: nodePort
+        nodePort:
+          # [필수] kubectl get nodes -o wide 로 확인한 건강한 워커 노드 IP
+          # 현재 kafka pod가 실행중인 l40s 노드의 IP를 사용합니다.
+          host: 10.38.38.97
+
+          # [필수] 각 카프카 브로커에 할당될 NodePort의 시작 번호
+          nodePortOffset: 32100
+          
+          # [선택] 최초 접속(bootstrap)을 위한 대표 포트
+          # CFK 버전에 따라 이 포트가 아닌 nodePortOffset 값이 부트스트랩 포트로 사용될 수 있습니다.
+          bootstrapPort: 32092
   podTemplate:
     resources:
       requests:
@@ -52,27 +62,22 @@ spec:
       - "confluent.schema.topic.replication.factor=3"
 
       # ★★★ 일반 토픽에 대한 '기본' 보존 정책 ★★★
-      # (개별 토픽 설정이 이 값을 덮어쓸 수 있음)
-      - "log.retention.hours=12"          # 기본 12시간 보관
-      - "log.retention.bytes=536870912"     # 파티션당 최대 512MB
-      - "log.segment.bytes=134217728"     # 로그 파일 하나의 크기는 128MB
-      - "compression.type=lz4"            # 기본 압축 lz4 사용
+      - "log.retention.hours=12"
+      - "log.retention.bytes=536870912"
+      - "log.segment.bytes=134217728"
+      - "compression.type=lz4"
 
       # ★★★ 추가된 최적화: 내부 관리 토픽 보존 기간 단축 ★★★
-      # 컨슈머 그룹의 오프셋 정보를 저장하는 토픽 (__consumer_offsets)의 보존 기간을
-      # 기본 7일(10080분)에서 1일(1440분)으로 줄여 디스크 공간을 절약합니다.
       - "offsets.topic.retention.minutes=1440"
-      # 트랜잭션 상태를 저장하는 로그(__transaction_state)의 보존 기간을
-      # 기본 7일에서 1일(86400000ms)로 줄여 디스크 공간을 절약합니다.
       - "transaction.state.log.retention.ms=86400000"
       
-      # ★★★ 메트릭 토픽 최적화 (기존 설정 유지) ★★★
+      # ★★★ 메트릭 토픽 최적화 ★★★
       - "confluent.metrics.reporter.enable=true"
       - "confluent.metrics.reporter.topic.partitions=3"
-      - "confluent.metrics.reporter.topic.replication.factor=1" # 복제본 1로 공간 절약
-      - "confluent.metrics.reporter.topic.retention.ms=3600000" # 1시간만 보관
+      - "confluent.metrics.reporter.topic.replication.factor=1"
+      - "confluent.metrics.reporter.topic.retention.ms=3600000"
       - "confluent.metrics.reporter.publish.ms=15000"
       
-      # ★★★ 불필요한 기능 비활성화 (기존 설정 유지) ★★★
+      # ★★★ 불필요한 기능 비활성화 ★★★
       - "confluent.telemetry.enable=false"
       - "confluent.self.balancing.enable=false"
