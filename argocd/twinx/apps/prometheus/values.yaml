@@ -24,7 +24,7 @@ alertmanager:
   persistence:
     enabled: true
     size: "2Gi"
-    storageClass: "nfs-dx-ssd-a"
+    storageClass: "rook-ceph-block"
   resources:
     requests:
       cpu: "100m"
