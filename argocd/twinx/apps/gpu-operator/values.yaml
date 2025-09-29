@@ -1,0 +1,2 @@
+# FILE: argocd/twinx/apps/gpu-operator/values.yaml
+# NVIDIA GPU Operator의 핵심 설정을 정의합니다.
