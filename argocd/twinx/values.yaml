@@ -161,7 +161,7 @@ applications:
         path: "argocd/twinx/apps/accumulation"
 
     postgresql:
-      enabled: false
+      enabled: true
       namespace: postgre
       syncWave: "8"
       source:
@@ -175,7 +175,7 @@ applications:
             - "argocd/twinx/apps/postgresql/values.yaml"
 
     nessie:
-      enabled: false
+      enabled: true
       namespace: nessie-ns
       syncWave: "9" # PostgreSQL 이후에 배포되도록 설정
       source:
