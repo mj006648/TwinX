@@ -174,23 +174,21 @@ applications:
             - "argocd/twinx/apps/cloudnativepg/values.yaml"
       syncOptions:
         - CreateNamespace=true
-    
-    postgresql:
-      enabled: false
+
+    cloudnative-pg-cluster:
+      enabled: true
       namespace: postgre
       syncWave: "9" # 오퍼레이터가 준비된 후 실행
       source:
         type: helm
-        # Bitnami가 아닌 CloudNativePG 차트 리포지토리를 사용
         repoURL: https://cloudnative-pg.github.io/charts
-        # 'postgresql' 차트가 아닌 'cluster' 차트를 사용
         chart: cluster
-        targetRevision: "0.26.0" # 오퍼레이터와 버전을 맞추는 것이 좋음
+        targetRevision: "0.3.1"
         helm:
           valueFiles:
-            - "argocd/twinx/apps/postgresql/values.yaml"
+            - "argocd/twinx/apps/cloudnativepg-cluster/values.yaml"
       syncOptions:
-        - CreateNamespace=true # 'postgre' 네임스페이스가 없다면 생성
+        - CreateNamespace=true
 
     nessie:
       enabled: false

@@ -1,0 +1,58 @@
+# ==============================================================================
+# CloudNativePG 'cluster' Helm Chart Values
+# 'nessiedb' 배포용으로 사용자의 요구사항에 맞춰 재구성된 파일입니다.
+# ==============================================================================
+
+# -- 클러스터의 기본 동작 모드
+mode: standalone
+# -- PostgreSQL 데이터베이스 타입
+type: postgresql
+
+# -- 사용할 PostgreSQL 메이저 버전
+version:
+  postgresql: "16"
+
+cluster:
+  # -- 클러스터의 인스턴스(Pod) 수. 이전 설정과 동일하게 1로 설정합니다.
+  instances: 1
+
+  # -- PostgreSQL 클러스터의 초기 설정을 담당합니다. (Bootstrap)
+  initdb:
+    # Nessie 카탈로그용으로 자동 생성할 데이터베이스 이름
+    database: nessiedb
+    # 위 데이터베이스의 소유자가 될 사용자 이름
+    owner: nessie_user
+    # 'nessie_user'의 암호를 저장할 Kubernetes Secret 설정
+    secret:
+      name: nessie-user-secret
+
+  # -- 슈퍼유저(postgres)의 암호를 저장하고 관리할 Secret의 이름입니다.
+  superuserSecret: "postgres-superuser-secret"
+
+  # -- 데이터 영속성을 위한 스토리지 설정
+  storage:
+    # PersistentVolumeClaim(PVC)의 크기
+    size: 10Gi
+    # 클러스터에 존재하는 StorageClass 이름을 정확히 지정합니다.
+    storageClass: "rook-ceph-block"
+
+  # -- 서비스 외부 노출 방식 설정
+  services:
+    # Primary(-rw) 서비스에 대한 설정
+    primary:
+      enabled: true
+      # 서비스를 LoadBalancer 타입으로 설정하여 외부 IP를 할당받습니다.
+      type: LoadBalancer
+
+  # -- Pod의 리소스 요청량 및 최대 사용량 제한
+  resources:
+    requests:
+      cpu: "250m"
+      memory: "512Mi"
+    limits:
+      cpu: "1"
+      memory: "1Gi"
+
+# -- 백업은 이 클러스터에서는 사용하지 않도록 비활성화합니다.
+backups:
+  enabled: false
