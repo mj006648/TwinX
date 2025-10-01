@@ -170,12 +170,13 @@ applications:
         chart: cloudnative-pg
         targetRevision: "0.26.0" # 안정적인 버전을 명시
         helm:
-          releaseName: cnpg
+          valueFiles:
+            - "argocd/twinx/apps/cloudnativepg/values.yaml"
       syncOptions:
         - CreateNamespace=true
     
     postgresql:
-      enabled: true
+      enabled: false
       namespace: postgre
       syncWave: "9" # 오퍼레이터가 준비된 후 실행
       source:
@@ -190,21 +191,6 @@ applications:
             - "argocd/twinx/apps/postgresql/values.yaml"
       syncOptions:
         - CreateNamespace=true # 'postgre' 네임스페이스가 없다면 생성
-
-
-    postgresql:
-      enabled: false
-      namespace: postgre
-      syncWave: "8"
-      source:
-        type: helm
-        repoURL: https://charts.bitnami.com/bitnami
-        chart: postgresql
-        #-- 안정적인 배포를 위해 차트 버전을 명시합니다.
-        targetRevision: "16.7.27"
-        helm:
-          valueFiles:
-            - "argocd/twinx/apps/postgresql/values.yaml"
 
     nessie:
       enabled: false
