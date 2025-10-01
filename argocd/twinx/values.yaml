@@ -14,7 +14,7 @@ applications:
     # 단순 yaml 파일들로 관리되는 애플리케이션
     # 첫 번째 애플리케이션
     cluster-config:
-      enabled: true
+      enabled: false
       namespace: default
       syncWave: "-1"
       source:
@@ -77,7 +77,7 @@ applications:
 
     # Prometheus 스택 배포
     prometheus:
-      enabled: true
+      enabled: false
       namespace: monitoring
       syncWave: "18" # Secret이 준비된 후 실행
       source:
@@ -91,7 +91,7 @@ applications:
 
     # Grafana 배포
     grafana:
-      enabled: true
+      enabled: false
       namespace: monitoring
       syncWave: "19" # Secret과 Prometheus가 모두 준비된 후 실행
       source:
@@ -143,7 +143,7 @@ applications:
 
     # Wave 3: 클러스터가 준비된 후, 스토리지 리소스와 툴박스를 배포 (YAML)
     rook-ceph-resources:
-      enabled: true
+      enabled: false
       namespace: rook-ceph # 리소스들이 생성될 기본 네임스페이스
       syncWave: "6"
       source:
@@ -153,7 +153,7 @@ applications:
         - ServerSideApply=true
 
     accumulation:
-      enabled: true
+      enabled: false
       # 이 애플리케이션이 관리하는 리소스들이 생성될 기본 네임스페이스
       namespace: accumulation
       syncWave: "7"
@@ -161,7 +161,7 @@ applications:
         path: "argocd/twinx/apps/accumulation"
 
     postgresql:
-      enabled: true
+      enabled: false
       namespace: postgre
       syncWave: "8"
       source:
