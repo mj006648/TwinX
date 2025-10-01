@@ -117,7 +117,7 @@ applications:
             - "argocd/twinx/apps/csi-driver-nfs/values.yaml"
     # Wave 1: Operator 배포 (헬름)
     rook-ceph-operator:
-      enabled: true
+      enabled: false
       namespace: rook-ceph
       syncWave: "4"
       source:
@@ -130,7 +130,7 @@ applications:
 
     # Wave 2: Ceph 클러스터 "자체"만 배포 (헬름)
     rook-ceph-cluster:
-      enabled: true
+      enabled: false
       namespace: rook-ceph
       syncWave: "5"
       source:
