@@ -153,7 +153,7 @@ applications:
         - ServerSideApply=true
 
     accumulation:
-      enabled: false
+      enabled: true
       # 이 애플리케이션이 관리하는 리소스들이 생성될 기본 네임스페이스
       namespace: accumulation
       syncWave: "7"
@@ -161,7 +161,7 @@ applications:
         path: "argocd/twinx/apps/accumulation"
 
     postgresql:
-      enabled: false
+      enabled: true
       namespace: postgre
       syncWave: "8"
       source:
