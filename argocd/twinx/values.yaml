@@ -161,7 +161,7 @@ applications:
         path: "argocd/twinx/apps/accumulation"
 
     postgresql:
-      enabled: false
+      enabled: true
       namespace: postgre
       syncWave: "8"
       source:
@@ -169,7 +169,7 @@ applications:
         repoURL: https://charts.bitnami.com/bitnami
         chart: postgresql
         #-- 안정적인 배포를 위해 차트 버전을 명시합니다.
-        targetRevision: "16.7.24"
+        targetRevision: "16.7.27"
         helm:
           valueFiles:
             - "argocd/twinx/apps/postgresql/values.yaml"
