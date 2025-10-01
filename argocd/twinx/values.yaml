@@ -130,7 +130,7 @@ applications:
 
     # Wave 2: Ceph 클러스터 "자체"만 배포 (헬름)
     rook-ceph-cluster:
-      enabled: true
+      enabled: false
       namespace: rook-ceph
       syncWave: "5"
       source:
