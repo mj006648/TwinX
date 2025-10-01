@@ -1,0 +1,32 @@
+{
+    "apiVersion": "objectbucket.io/v1alpha1",
+    "kind": "ObjectBucketClaim",
+    "metadata": {
+        "annotations": {
+            "argocd.argoproj.io/tracking-id": "accumulation:objectbucket.io/ObjectBucketClaim:accumulation/iceberg-bucket",
+            "kubectl.kubernetes.io/last-applied-configuration": "{\"apiVersion\":\"objectbucket.io/v1alpha1\",\"kind\":\"ObjectBucketClaim\",\"metadata\":{\"annotations\":{\"argocd.argoproj.io/tracking-id\":\"accumulation:objectbucket.io/ObjectBucketClaim:accumulation/iceberg-bucket\"},\"name\":\"iceberg-bucket\",\"namespace\":\"accumulation\"},\"spec\":{\"bucketName\":\"iceberg-data\",\"storageClassName\":\"rook-ceph-iceberg-sc\"}}\n"
+        },
+        "creationTimestamp": "2025-09-25T07:47:35Z",
+        "deletionGracePeriodSeconds": 0,
+        "deletionTimestamp": "2025-10-01T05:57:30Z",
+        "finalizers": [
+            "objectbucket.io/finalizer"
+        ],
+        "generation": 3,
+        "labels": {
+            "bucket-provisioner": "rook-ceph.ceph.rook.io-bucket"
+        },
+        "name": "iceberg-bucket",
+        "namespace": "accumulation",
+        "resourceVersion": "20360416",
+        "uid": "1f87351d-6eaf-4608-bf63-3fe175aed9d9"
+    },
+    "spec": {
+        "bucketName": "iceberg-data",
+        "objectBucketName": "obc-accumulation-iceberg-bucket",
+        "storageClassName": "rook-ceph-iceberg-sc"
+    },
+    "status": {
+        "phase": "Bound"
+    }
+}

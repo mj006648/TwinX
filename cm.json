@@ -1,0 +1,36 @@
+{
+    "apiVersion": "v1",
+    "data": {
+        "BUCKET_HOST": "rook-ceph-rgw-iceberg-store.rook-ceph.svc",
+        "BUCKET_NAME": "iceberg-data",
+        "BUCKET_PORT": "8080",
+        "BUCKET_REGION": "",
+        "BUCKET_SUBREGION": ""
+    },
+    "kind": "ConfigMap",
+    "metadata": {
+        "creationTimestamp": "2025-09-25T07:52:03Z",
+        "deletionGracePeriodSeconds": 0,
+        "deletionTimestamp": "2025-10-01T05:57:31Z",
+        "finalizers": [
+            "objectbucket.io/finalizer"
+        ],
+        "labels": {
+            "bucket-provisioner": "rook-ceph.ceph.rook.io-bucket"
+        },
+        "name": "iceberg-bucket",
+        "namespace": "accumulation",
+        "ownerReferences": [
+            {
+                "apiVersion": "objectbucket.io/v1alpha1",
+                "blockOwnerDeletion": true,
+                "controller": true,
+                "kind": "ObjectBucketClaim",
+                "name": "iceberg-bucket",
+                "uid": "1f87351d-6eaf-4608-bf63-3fe175aed9d9"
+            }
+        ],
+        "resourceVersion": "20360421",
+        "uid": "da4c658b-8100-4811-a0e0-80daeac1bcb9"
+    }
+}
