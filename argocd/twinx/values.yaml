@@ -14,7 +14,7 @@ applications:
     # 단순 yaml 파일들로 관리되는 애플리케이션
     # 첫 번째 애플리케이션
     cluster-config:
-      enabled: true
+      enabled: false
       namespace: default
       syncWave: "-1"
       source:
@@ -28,7 +28,7 @@ applications:
         path: "argocd/twinx/apps/metallb-resources"
    
     gpu-operator:
-      enabled: false
+      enabled: true
       namespace: gpu-operator # Operator와 관련 컴포넌트를 설치할 네임스페이스
       syncWave: "2"
       source:
@@ -48,14 +48,14 @@ applications:
     
     # Grafana Secret을 가장 먼저 배포
     grafana-resources:
-      enabled: true
+      enabled: false
       namespace: monitoring
       syncWave: "17" # Prometheus보다 먼저 실행되어야 함
       source:
         path: "argocd/twinx/apps/grafana-resources"      
 
     twinx-web:
-      enabled: true
+      enabled: false
       namespace: tx-service
       syncWave: "22"
       source:
@@ -63,7 +63,7 @@ applications:
     
     # Helm 차트로 관리되는 애플리케이션
     metallb:
-        enabled: true
+        enabled: false
         namespace: metallb-system
         syncWave: "0"
         source:
@@ -117,7 +117,7 @@ applications:
             - "argocd/twinx/apps/csi-driver-nfs/values.yaml"
     # Wave 1: Operator 배포 (헬름)
     rook-ceph-operator:
-      enabled: true
+      enabled: false
       namespace: rook-ceph
       syncWave: "4"
       source:
@@ -130,7 +130,7 @@ applications:
 
     # Wave 2: Ceph 클러스터 "자체"만 배포 (헬름)
     rook-ceph-cluster:
-      enabled: true
+      enabled: false
       namespace: rook-ceph
       syncWave: "5"
       source:
@@ -143,7 +143,7 @@ applications:
 
     # Wave 3: 클러스터가 준비된 후, 스토리지 리소스와 툴박스를 배포 (YAML)
     rook-ceph-resources:
-      enabled: true
+      enabled: false
       namespace: rook-ceph # 리소스들이 생성될 기본 네임스페이스
       syncWave: "6"
       source:
@@ -153,7 +153,7 @@ applications:
         - ServerSideApply=true
 
     accumulation:
-      enabled: true
+      enabled: false
       # 이 애플리케이션이 관리하는 리소스들이 생성될 기본 네임스페이스
       namespace: accumulation
       syncWave: "7"
@@ -204,7 +204,7 @@ applications:
         - CreateNamespace=true
 
     confluent-operator:
-      enabled: true
+      enabled: false
       namespace: confluent
       syncWave: "11"
       source:
@@ -218,7 +218,7 @@ applications:
 
     # (Operator가 생성된 후, CRD들이 배포되도록)
     confluent-platform:
-      enabled: true
+      enabled: false
       namespace: confluent # 모든 컴포넌트는 confluent 네임스페이스에 배포
       syncWave: "12"
       source:
@@ -226,7 +226,7 @@ applications:
 
     # (플랫폼이 완전히 준비된 후)
     confluent-resources:
-      enabled: true
+      enabled: false
       namespace: confluent
       syncWave: "13"
       source:
@@ -283,7 +283,7 @@ applications:
         - CreateNamespace=true # ArgoCD가 'superset' 네임스페이스를 자동으로 생성
 
     trino:
-      enabled: true
+      enabled: false
       namespace: trino # Trino 컴포넌트를 설치할 네임스페이스
       syncWave: "21"
       source:

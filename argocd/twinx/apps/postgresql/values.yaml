@@ -35,7 +35,7 @@ primary:
     enabled: true
     # 클러스터에 존재하는 동적 프로비저닝 가능한 StorageClass 이름을 정확히 지정해야 합니다.
     # 예: rook-ceph-block, gp2 등. rook-ceph-block-immediate도 가능합니다.
-    storageClass: "rook-ceph-block"
+    storageClass: "rook-ceph-block-kafka"
     size: 10Gi
 
   #-- Pod의 리소스 요청량 및 최대 사용량 제한
