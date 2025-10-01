@@ -160,6 +160,38 @@ applications:
       source:
         path: "argocd/twinx/apps/accumulation"
 
+    cloudnative-pg-operator:
+      enabled: true
+      namespace: cnpg-system # 오퍼레이터는 별도의 네임스페이스에 설치하는 것을 권장
+      syncWave: "8"
+      source:
+        type: helm
+        repoURL: https://cloudnative-pg.github.io/charts
+        chart: cloudnative-pg
+        targetRevision: "0.26.0" # 안정적인 버전을 명시
+        helm:
+          releaseName: cnpg
+      syncOptions:
+        - CreateNamespace=true
+    
+    postgresql:
+      enabled: true
+      namespace: postgre
+      syncWave: "9" # 오퍼레이터가 준비된 후 실행
+      source:
+        type: helm
+        # Bitnami가 아닌 CloudNativePG 차트 리포지토리를 사용
+        repoURL: https://cloudnative-pg.github.io/charts
+        # 'postgresql' 차트가 아닌 'cluster' 차트를 사용
+        chart: cluster
+        targetRevision: "0.26.0" # 오퍼레이터와 버전을 맞추는 것이 좋음
+        helm:
+          valueFiles:
+            - "argocd/twinx/apps/postgresql/values.yaml"
+      syncOptions:
+        - CreateNamespace=true # 'postgre' 네임스페이스가 없다면 생성
+
+
     postgresql:
       enabled: false
       namespace: postgre
