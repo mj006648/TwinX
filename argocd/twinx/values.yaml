@@ -143,7 +143,7 @@ applications:
 
     # Wave 3: 클러스터가 준비된 후, 스토리지 리소스와 툴박스를 배포 (YAML)
     rook-ceph-resources:
-      enabled: false
+      enabled: true
       namespace: rook-ceph # 리소스들이 생성될 기본 네임스페이스
       syncWave: "6"
       source:
