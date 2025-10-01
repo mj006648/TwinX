@@ -9,7 +9,7 @@ persistence:
   enabled: true
   type: pvc
   size: "5Gi"
-  storageClassName: "nfs-dx-ssd-a"
+  storageClassName: "rook-ceph-block"
 
 securityContext:
   fsGroup: 1007
