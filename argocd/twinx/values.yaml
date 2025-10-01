@@ -161,7 +161,7 @@ applications:
         path: "argocd/twinx/apps/accumulation"
 
     postgresql:
-      enabled: true
+      enabled: false
       namespace: postgre
       syncWave: "8"
       source:
