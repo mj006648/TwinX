@@ -58,4 +58,4 @@ shmVolume:
 
 #-- 볼륨 권한 문제를 해결하기 위한 초기화 컨테이너(init container)를 활성화합니다.
 volumePermissions:
-  enabled: true
+  enabled: false
