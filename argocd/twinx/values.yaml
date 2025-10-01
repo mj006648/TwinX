@@ -161,7 +161,7 @@ applications:
         path: "argocd/twinx/apps/accumulation"
 
     cloudnative-pg-operator:
-      enabled: false
+      enabled: true
       namespace: cnpg-system # 오퍼레이터는 별도의 네임스페이스에 설치하는 것을 권장
       syncWave: "8"
       source:
