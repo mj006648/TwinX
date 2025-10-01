@@ -5,7 +5,7 @@ image:
   # "실행 파일"이 보관된 창고 주소
   repository: bitnami/postgresql
   # "실행 파일"의 정확한 버전(태그). Docker Hub에서 확인한 안정적인 버전입니다.
-  tag: "16.7.27"
+  tag: "16.3.0-debian-12-r22"
 
 ###############################################################################
 # Bitnami PostgreSQL Helm 차트 values.yaml for ArgoCD
