@@ -1,11 +1,6 @@
 # 파일 경로: argocd/twinx/apps/postgresql/values.yaml
 
 # PostgreSQL 컨테이너 이미지(실제 실행될 소프트웨어)의 정보를 명시적으로 지정합니다.
-image:
-  # "실행 파일"이 보관된 창고 주소
-  repository: bitnami/postgresql
-  # "실행 파일"의 정확한 버전(태그). Docker Hub에서 확인한 안정적인 버전입니다.
-  tag: "16.3.0-debian-12-r22"
 
 ###############################################################################
 # Bitnami PostgreSQL Helm 차트 values.yaml for ArgoCD
