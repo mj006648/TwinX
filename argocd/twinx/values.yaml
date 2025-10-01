@@ -55,7 +55,7 @@ applications:
         path: "argocd/twinx/apps/grafana-resources"      
 
     twinx-web:
-      enabled: false
+      enabled: true
       namespace: tx-service
       syncWave: "22"
       source:
