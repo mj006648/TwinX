@@ -8,7 +8,7 @@ admin:
 persistence:
   enabled: true
   type: pvc
-  size: "5Gi"
+  size: "10Gi"
   storageClassName: "rook-ceph-block"
 
 securityContext:
