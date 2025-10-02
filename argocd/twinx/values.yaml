@@ -176,12 +176,12 @@ applications:
         - CreateNamespace=true
         - ServerSideApply=true
 
-    cloudnative-pg-secret:
-      enabled: false
+    cloudnative-pg-resources:
+      enabled: true
       namespace: postgre
-      syncWave: "9" # 오퍼레이터가 준비된 후 실행
+      syncWave: "11" # 오퍼레이터가 준비된 후 실행
       source:
-        path: "argocd/twinx/apps/cloudnativepg-secret" 
+        path: "argocd/twinx/apps/cloudnativepg-resource" 
       syncOptions:
         - CreateNamespace=true
 
