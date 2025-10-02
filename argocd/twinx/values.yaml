@@ -177,7 +177,7 @@ applications:
         - ServerSideApply=true
 
     cloudnative-pg-cluster:
-      enabled: false
+      enabled: true
       namespace: postgre
       syncWave: "9" # 오퍼레이터가 준비된 후 실행
       source:
@@ -192,7 +192,7 @@ applications:
         - CreateNamespace=true
 
     cloudnative-pg-resources:
-      enabled: false
+      enabled: true
       namespace: postgre
       syncWave: "10" # 오퍼레이터가 준비된 후 실행
       source:

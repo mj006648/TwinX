@@ -7,11 +7,15 @@ version:
 cluster:
   instances: 1
   initdb:
-    database: nessiedb
-    owner: nessie_user
+    # 데이터베이스 이름을 변경
+    database: nessie_prod_db
+    # 소유자(사용자) 이름을 변경
+    owner: nessie_prod_user
+    # 생성될 Secret의 이름을 변경
     secret:
-      name: nessie-user-secret
-  superuserSecret: "postgres-superuser-secret"
+      name: nessie-prod-user-secret
+  # 슈퍼유저 Secret 이름도 충돌 방지를 위해 변경
+  superuserSecret: "nessie-db-superuser-secret"
   storage:
     size: 10Gi
     storageClass: "rook-ceph-block"

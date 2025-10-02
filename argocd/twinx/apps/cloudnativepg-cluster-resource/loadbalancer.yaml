@@ -3,14 +3,13 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: postgres-loadbalancer  # 서비스 이름
-  namespace: postgre          # PostgreSQL이 설치된 네임스페이스
+  # 서비스 이름도 새로운 클러스터 이름에 맞춰 변경
+  name: nessie-database-lb
+  namespace: postgre
 spec:
-  type: LoadBalancer          # 타입을 LoadBalancer로 지정
+  type: LoadBalancer
   selector:
-    # 이 부분이 핵심입니다!
-    # CNPG 오퍼레이터가 생성하는 Primary(-rw) 파드를 정확히 가리키는 라벨
-    cnpg.io/cluster: cloudnative-pg-cluster
+    cnpg.io/cluster: nessie-database
     cnpg.io/instanceRole: primary
   ports:
     - name: postgres
