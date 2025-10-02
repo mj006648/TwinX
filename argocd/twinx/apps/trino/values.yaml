@@ -14,19 +14,17 @@ catalogs:
     iceberg.catalog.type=nessie
     iceberg.nessie-catalog.uri=http://nessie.nessie-ns.svc:19120/api/v1
     iceberg.nessie-catalog.ref=main
-    iceberg.nessie-catalog.default-warehouse-dir=s3a://iceberg-data/warehouse
+    iceberg.nessie-catalog.default-warehouse-dir=s3a://chang-data/warehouse 
 
     # Native S3 파일 시스템 활성화
     fs.native-s3.enabled=true
 
     # Native S3 속성
-    s3.endpoint=http://rook-ceph-rgw-iceberg-store.rook-ceph.svc:8080
-    s3.aws-access-key=HJTGW2KLUPXY9VY7EKTZ
-    s3.aws-secret-key=DAvzefZnjsoptHGQk2kwkmofWzIMbx8tKvqolL7l
+    s3.endpoint=http://rook-ceph-rgw-chang-store.rook-ceph.svc:8080 
+    s3.aws-access-key=VCM10IG6Q1IU0YDDJZ2I
+    s3.aws-secret-key=gn19N9osSLFx5YA4Q0sk2Fo38q8BsRKuTikm1Aoq 
     s3.path-style-access=true
     
-    # [최종 수정] S3 클라이언트 초기화를 위한 리전 정보 추가
-    # Rook-Ceph는 특정 리전에 종속되지 않으므로, 임의의 유효한 리전 값을 넣어줍니다.
+    # S3 클라이언트 초기화를 위한 리전 정보 추가
     s3.region=us-east-1
-
 

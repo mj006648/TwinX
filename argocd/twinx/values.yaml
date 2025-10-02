@@ -57,7 +57,7 @@ applications:
     twinx-web:
       enabled: true
       namespace: tx-service
-      syncWave: "22"
+      syncWave: "24"
       source:
         path: "argocd/twinx/apps/twinx-web"
     
@@ -79,7 +79,7 @@ applications:
     prometheus:
       enabled: true
       namespace: monitoring
-      syncWave: "18" # Secret이 준비된 후 실행
+      syncWave: "20" # Secret이 준비된 후 실행
       source:
         type: helm
         repoURL: https://prometheus-community.github.io/helm-charts
@@ -93,7 +93,7 @@ applications:
     grafana:
       enabled: true
       namespace: monitoring
-      syncWave: "19" # Secret과 Prometheus가 모두 준비된 후 실행
+      syncWave: "21" # Secret과 Prometheus가 모두 준비된 후 실행
       source:
         type: helm
         repoURL: https://grafana.github.io/helm-charts
@@ -179,7 +179,7 @@ applications:
     cloudnative-pg-resources:
       enabled: true
       namespace: postgre
-      syncWave: "11" # 오퍼레이터가 준비된 후 실행
+      syncWave: "10" # 오퍼레이터가 준비된 후 실행
       source:
         path: "argocd/twinx/apps/cloudnativepg-resources" 
       syncOptions:
@@ -188,7 +188,7 @@ applications:
     cloudnative-pg-cluster:
       enabled: true
       namespace: postgre
-      syncWave: "10" # 오퍼레이터가 준비된 후 실행
+      syncWave: "9" # 오퍼레이터가 준비된 후 실행
       source:
         type: helm
         repoURL: https://cloudnative-pg.github.io/charts
@@ -203,7 +203,7 @@ applications:
     nessie:
       enabled: true
       namespace: nessie-ns
-      syncWave: "12" # PostgreSQL 이후에 배포되도록 설정
+      syncWave: "11" # PostgreSQL 이후에 배포되도록 설정
       source:
         type: helm
         repoURL: https://charts.projectnessie.org
@@ -219,7 +219,7 @@ applications:
     nessie-resources:
       enabled: true
       namespace: nessie-ns
-      syncWave: "13" # nessie Helm 차트와 동시에 배포
+      syncWave: "12" # nessie Helm 차트와 동시에 배포
       source:
         path: "argocd/twinx/apps/nessie-resources"
         directory:
@@ -232,7 +232,7 @@ applications:
     confluent-operator:
       enabled: true
       namespace: confluent
-      syncWave: "11"
+      syncWave: "13"
       source:
         type: helm
         repoURL: https://packages.confluent.io/helm
@@ -246,7 +246,7 @@ applications:
     confluent-platform:
       enabled: true
       namespace: confluent # 모든 컴포넌트는 confluent 네임스페이스에 배포
-      syncWave: "12"
+      syncWave: "14"
       source:
         path: "argocd/twinx/apps/confluent-platform"
 
@@ -254,14 +254,14 @@ applications:
     confluent-resources:
       enabled: true
       namespace: confluent
-      syncWave: "13"
+      syncWave: "15"
       source:
         path: "argocd/twinx/apps/confluent-resources"
     
     spark-operator: # (기존 spark-operator-helm에서 이름 변경)
       enabled: true
       namespace: spark-operator
-      syncWave: "14"
+      syncWave: "16"
       source:
         type: helm
         repoURL: https://kubeflow.github.io/spark-operator
@@ -278,7 +278,7 @@ applications:
     spark-job-configs:
       enabled: true
       namespace: spark-operator
-      syncWave: "15"
+      syncWave: "17"
       source:
         path: "argocd/twinx/apps/job-configs"
 
@@ -286,14 +286,14 @@ applications:
     spark-applications: # (기존 spark-job-schedules에서 이름 변경)
       enabled: false
       namespace: spark-operator
-      syncWave: "16"
+      syncWave: "18"
       source:
         path: "argocd/twinx/apps/job-schedules"
 
     superset:
       enabled: false
       namespace: superset
-      syncWave: "20" # 다른 모든 인프라가 준비된 후 배포
+      syncWave: "22" # 다른 모든 인프라가 준비된 후 배포
       source:
         type: helm
         repoURL: https://charts.bitnami.com/bitnami
@@ -311,7 +311,7 @@ applications:
     trino:
       enabled: false
       namespace: trino # Trino 컴포넌트를 설치할 네임스페이스
-      syncWave: "21"
+      syncWave: "23"
       source:
         type: helm
         repoURL: https://trinodb.github.io/charts/  # Trino 공식 Helm 리포지토리
