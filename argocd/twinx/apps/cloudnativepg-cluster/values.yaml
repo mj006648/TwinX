@@ -1,52 +1,20 @@
-# ==============================================================================
-# CloudNativePG 'cluster' Helm Chart Values (최종 수정안)
-# ==============================================================================
-
-# -- 클러스터의 기본 동작 모드
 mode: standalone
-# -- PostgreSQL 데이터베이스 타입
 type: postgresql
 
-# -- 사용할 PostgreSQL 메저 버전
 version:
   postgresql: "16"
 
 cluster:
-  # -- 클러스터의 인스턴스(Pod) 수
   instances: 1
-
-  # -- PostgreSQL 클러스터의 초기 설정을 담당합니다.
   initdb:
     database: nessiedb
     owner: nessie_user
     secret:
       name: nessie-user-secret
-
-  # -- 슈퍼유저(postgres)의 암호를 저장하고 관리할 Secret의 이름입니다.
   superuserSecret: "postgres-superuser-secret"
-
-  # -- 데이터 영속성을 위한 스토리지 설정
   storage:
     size: 10Gi
     storageClass: "rook-ceph-block"
-
-  # -- ★★★ 바로 이 부분입니다! LoadBalancer를 위한 올바른 서비스 설정 ★★★
-  managed:
-    services:
-      additional:
-        - selectorType: rw
-          serviceTemplate:
-            metadata:
-              name: "nessiedb-loadbalancer"
-            spec:
-              type: LoadBalancer
-              ports:
-                - name: postgres
-                  port: 5432
-                  targetPort: 5432
-                  protocol: TCP
-
-  # -- Pod의 리소스 요청량 및 최대 사용량 제한
   resources:
     requests:
       cpu: "250m"
@@ -55,6 +23,5 @@ cluster:
       cpu: "1"
       memory: "1Gi"
 
-# -- 백업은 비활성화합니다.
 backups:
   enabled: false

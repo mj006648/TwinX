@@ -191,6 +191,13 @@ applications:
       syncOptions:
         - CreateNamespace=true
 
+    cloudnative-pg-resources:
+      enabled: true
+      namespace: postgre
+      syncWave: "10" # 오퍼레이터가 준비된 후 실행
+      source:
+        path: "argocd/twinx/apps/cloudnativepg-resources" 
+
     nessie:
       enabled: false
       namespace: nessie-ns

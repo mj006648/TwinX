@@ -1,0 +1,19 @@
+# 파일 경로: argocd/twinx/apps/cloudnativepg-cluster-resource/loadbalancer.yaml
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-loadbalancer  # 서비스 이름
+  namespace: postgre          # PostgreSQL이 설치된 네임스페이스
+spec:
+  type: LoadBalancer          # 타입을 LoadBalancer로 지정
+  selector:
+    # 이 부분이 핵심입니다!
+    # CNPG 오퍼레이터가 생성하는 Primary(-rw) 파드를 정확히 가리키는 라벨
+    cnpg.io/cluster: cloudnative-pg-cluster
+    cnpg.io/instanceRole: primary
+  ports:
+    - name: postgres
+      port: 5432
+      targetPort: 5432
+      protocol: TCP
