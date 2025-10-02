@@ -1,9 +1,28 @@
-# 파일 경로: argocd/twinx/apps/postgresql/cnpg-values.yaml (CNPG용)
+CNPG 헬름 차트의 values.yaml 구조 오류를 수정하고, 제시해주신 모든 설정을 반영한 최종 cloudnative-pg-cluster/values.yaml 전체 코드를 제공해 드립니다.
 
-# -- 오버라이드 설정 (선택 사항)
-# nameOverride: ""
-# fullnameOverride: ""
-# namespaceOverride: ""
+이 파일은 단일 인스턴스, LoadBalancer 서비스, 선언적 역할(Roles) 관리, 그리고 Nessie DB/User 생성을 CNPG 방식으로 완벽하게 구현합니다.
+
+🛠️ 수정된 CNPG Cluster values.yaml 전체 코드
+이 파일은 argocd/twinx/apps/cloudnativepg-cluster/values.yaml 경로에 사용될 것입니다.
+
+핵심 변경 사항:
+
+cluster.services: 배열([])에서 객체({}) 구조로 수정하여 ArgoCD 렌더링 오류(Invalid type. Expected: object, given: array)를 해결했습니다.
+
+cluster.roles: nessie_prod_user를 선언적으로 생성하도록 추가했습니다.
+
+cluster.enablePDB: 단일 인스턴스 구성을 위해 false로 설정했습니다.
+
+YAML
+
+# 파일 경로: argocd/twinx/apps/cloudnativepg-cluster/values.yaml
+
+# -- Override the name of the chart
+nameOverride: ""
+# -- Override the full name of the chart
+fullnameOverride: ""
+# -- Override the namespace of the chart
+namespaceOverride: ""
 
 ###
 # -- Type of the CNPG database.
@@ -11,33 +30,36 @@ type: postgresql
 
 version:
   # -- PostgreSQL major version to use
-  postgresql: "16" # Bitnami 차트에서 사용하는 버전과 일치시키거나 원하는 버전으로 지정
+  postgresql: "16" 
+  # -- If using TimescaleDB, specify the version (기본값 유지)
+  timescaledb: "2.15"
+  # -- If using PostGIS, specify the version (기본값 유지)
+  postgis: "3.4"
 
 ###
 # -- Cluster mode of operation.
 mode: standalone
 
+recovery: {} # 복구 모드 비활성화 (기본값 사용)
+
+
 # -- 클러스터 기본 설정
 cluster:
-  # Bitnami의 'architecture: standalone'과 유사하게,
-  # 단일 인스턴스 PostgreSQL 클러스터로 구성합니다.
+  # 단일 인스턴스 PostgreSQL 클러스터로 구성 (Bitnami standalone 및 readReplicas: false 대응)
   instances: 1
 
-  # -- 데이터 영속성을 위한 PersistentVolumeClaim(PVC) 설정
+  # -- 데이터 영속성을 위한 PersistentVolumeClaim(PVC) 설정 (Bitnami persistence 대응)
   storage:
-    # Bitnami에서 설정한 크기와 동일하게 설정
     size: 10Gi
-    # Bitnami에서 설정한 StorageClass 이름 지정
     storageClass: "rook-ceph-block"
 
-  # -- WAL 저장소를 별도로 사용하지 않도록 비활성화 (기존 설정에 WAL 스토리지가 없었음)
+  # -- WAL 저장소를 별도로 사용하지 않도록 비활성화
   walStorage:
     enabled: false
     # size: 1Gi
     # storageClass: ""
 
-  # -- Pod의 리소스 요청량 및 최대 사용량 제한
-  # Bitnami에서 설정한 값과 동일하게 설정
+  # -- Pod의 리소스 요청량 및 최대 사용량 제한 (Bitnami resources 대응)
   resources:
     limits:
       cpu: "1"
@@ -46,46 +68,41 @@ cluster:
       cpu: "250m"
       memory: "512Mi"
 
-  # -- Superuser 비밀번호 관리 활성화 (Postgres 사용자)
-  # 별도 Superuser Secret 이름을 지정하지 않으면, Operator가 자동으로 생성하고 관리합니다.
+  # -- Superuser 비밀번호 관리 활성화 (CNPG Operator가 Secret 자동 생성)
   enableSuperuserAccess: true
-  superuserSecret: "" # CNPG Operator가 기본값으로 관리하도록 비워둠
+  superuserSecret: "" 
 
-  # -- 서비스 외부 노출 방식 설정: LoadBalancer
+  # -- 서비스 외부 노출 방식 설정: LoadBalancer (오류 수정 완료)
+  # CNPG 차트는 이 필드를 '객체'로 기대하며, 각 서비스는 내부 키로 정의됩니다.
   services:
-    # Primary 인스턴스(read-write) 서비스 설정
-    - name: primary
+    # Primary (read-write) 서비스 설정: LoadBalancer 타입 적용
+    primary:
       type: LoadBalancer
-    # Replica(read-only)는 인스턴스가 1개이므로 primary 서비스가 대신 read-only 역할도 수행할 수 있습니다.
-    # 하지만 Read Replica를 비활성화 했으므로 Read-Only 서비스는 필요 없을 수 있습니다.
-    # - name: replica
-    #   type: ClusterIP
+    # Read-Only 서비스는 단일 인스턴스이므로 기본값(ClusterIP)을 유지하거나 제거할 수 있습니다.
+    # replica: {} # 주석 처리하면 기본 ClusterIP가 생성됨
 
-  # -- 볼륨 권한 문제를 해결하기 위한 설정 (CNPG는 Operator가 관리하는 부분이므로, 별도의 initContainer 설정은 필요하지 않을 수 있습니다.)
-  # 그러나 만약 필요하다면, CNPG가 사용하는 기본 user/group ID를 고려하여 설정할 수 있습니다.
-  # postgresUID: -1 # 기본값인 26을 사용하거나 -1 (이미지 기본값) 사용
-  # postgresGID: -1
+  # -- Pod Disruption Budget (PDB) 비활성화 (단일 인스턴스 업그레이드 편의성)
+  enablePDB: false
 
-  # Bitnami의 shmVolume: enabled: true, sizeLimit: 1Gi 에 대응하는 설정은 CNPG에서는 명시적이지 않습니다.
-  # PostgreSQL 컨테이너는 대개 충분한 shared memory를 위해 tmpfs를 사용하므로,
-  # CNPG Pod 템플릿의 `volumes`와 `volumeMounts`를 커스텀해야 할 수 있지만,
-  # 일단 기본 설정으로 시작하고 필요하면 `cluster.template`을 통해 조정하는 것이 좋습니다.
+  # -- Nessie 프로덕션 사용자 선언적으로 생성 (4단계 SQL 실행을 위해 필요)
+  roles:
+    - name: nessie_prod_user
+      ensure: present
+      login: true
+      superuser: false
 
-  # -- Nessie 카탈로그용 데이터베이스 및 사용자 생성 설정
-  # Bitnami의 'auth' 섹션에 해당
+  # -- Nessie 카탈로그용 데이터베이스 및 사용자 생성 설정 (Bitnami auth 대응)
   initdb:
     # Nessie 카탈로그용으로 자동 생성할 데이터베이스 이름
     database: nessiedb
     # 위 데이터베이스에 접근할 사용자 이름 (Owner)
-    owner: nessie_user # Bitnami의 'username'에 해당
+    owner: nessie_user 
     # Owner의 비밀번호를 담을 Secret 이름. 비워두면 Operator가 자동으로 생성합니다.
     secret: ""
-    # Owner의 비밀번호는 생성된 Secret에서 자동으로 관리되므로,
-    # Bitnami처럼 'password'를 직접 명시하지 않고 Secret을 사용해야 합니다.
 
-# -- 백업 설정 (기존 Bitnami 설정에 백업 정보가 없으므로 비활성화)
+# -- 백업 설정 (기존 Bitnami 설정에 없으므로 비활성화)
 backups:
   enabled: false
 
-# -- PgBouncer는 기존 설정에 없으므로 비활성화 (Poolers 리스트를 비워둠)
+# -- PgBouncer는 기존 설정에 없으므로 비활성화 유지
 poolers: []
