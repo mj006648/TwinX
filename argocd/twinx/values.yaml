@@ -181,7 +181,7 @@ applications:
       namespace: postgre
       syncWave: "11" # 오퍼레이터가 준비된 후 실행
       source:
-        path: "argocd/twinx/apps/cloudnativepg-resource" 
+        path: "argocd/twinx/apps/cloudnativepg-resources" 
       syncOptions:
         - CreateNamespace=true
 
