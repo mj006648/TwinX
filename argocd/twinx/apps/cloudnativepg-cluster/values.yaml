@@ -1,59 +1,91 @@
-# 파일 경로: argocd/twinx/apps/cloudnativepg-cluster/values.yaml
+# 파일 경로: argocd/twinx/apps/postgresql/cnpg-values.yaml (CNPG용)
 
-# -- PostgreSQL 버전을 지정합니다.
+# -- 오버라이드 설정 (선택 사항)
+# nameOverride: ""
+# fullnameOverride: ""
+# namespaceOverride: ""
+
+###
+# -- Type of the CNPG database.
+type: postgresql
+
 version:
-  postgresql: "16"
+  # -- PostgreSQL major version to use
+  postgresql: "16" # Bitnami 차트에서 사용하는 버전과 일치시키거나 원하는 버전으로 지정
 
-# -- 클러스터 운영 모드를 'standalone'으로 설정하여 단일 인스턴스를 생성합니다.
+###
+# -- Cluster mode of operation.
 mode: standalone
 
+# -- 클러스터 기본 설정
 cluster:
-  # -- 인스턴스 개수입니다. 기존 Bitnami 차트의 'architecture: standalone' 설정과 동일합니다.
+  # Bitnami의 'architecture: standalone'과 유사하게,
+  # 단일 인스턴스 PostgreSQL 클러스터로 구성합니다.
   instances: 1
 
-  # -- Pod의 리소스 요청 및 제한 설정입니다. 기존 Bitnami 설정을 그대로 가져옵니다.
-  # Guaranteed QoS를 위해 requests와 limits를 동일하게 설정하는 것을 권장하지만,
-  # 여기서는 기존 설정을 유지했습니다.
+  # -- 데이터 영속성을 위한 PersistentVolumeClaim(PVC) 설정
+  storage:
+    # Bitnami에서 설정한 크기와 동일하게 설정
+    size: 10Gi
+    # Bitnami에서 설정한 StorageClass 이름 지정
+    storageClass: "rook-ceph-block"
+
+  # -- WAL 저장소를 별도로 사용하지 않도록 비활성화 (기존 설정에 WAL 스토리지가 없었음)
+  walStorage:
+    enabled: false
+    # size: 1Gi
+    # storageClass: ""
+
+  # -- Pod의 리소스 요청량 및 최대 사용량 제한
+  # Bitnami에서 설정한 값과 동일하게 설정
   resources:
-    requests:
-      cpu: "250m"
-      memory: "512Mi"
     limits:
       cpu: "1"
       memory: "1Gi"
+    requests:
+      cpu: "250m"
+      memory: "512Mi"
 
-  # -- 데이터 영속성을 위한 스토리지 설정입니다. 기존 Bitnami 설정을 그대로 가져옵니다.
-  storage:
-    size: 10Gi
-    storageClass: "rook-ceph-block"
+  # -- Superuser 비밀번호 관리 활성화 (Postgres 사용자)
+  # 별도 Superuser Secret 이름을 지정하지 않으면, Operator가 자동으로 생성하고 관리합니다.
+  enableSuperuserAccess: true
+  superuserSecret: "" # CNPG Operator가 기본값으로 관리하도록 비워둠
 
-  # -- 서비스를 외부로 노출하기 위한 설정입니다.
-  # 기존 'primary.service.type: LoadBalancer' 설정을 반영합니다.
+  # -- 서비스 외부 노출 방식 설정: LoadBalancer
   services:
-    primary:
+    # Primary 인스턴스(read-write) 서비스 설정
+    - name: primary
       type: LoadBalancer
+    # Replica(read-only)는 인스턴스가 1개이므로 primary 서비스가 대신 read-only 역할도 수행할 수 있습니다.
+    # 하지만 Read Replica를 비활성화 했으므로 Read-Only 서비스는 필요 없을 수 있습니다.
+    # - name: replica
+    #   type: ClusterIP
 
-  # -- PostgreSQL 슈퍼유저(postgres)의 패스워드를 관리할 Secret의 이름을 지정합니다.
-  # 이 Secret은 아래에서 직접 생성해야 합니다.
-  superuserSecret: "postgres-superuser-password"
+  # -- 볼륨 권한 문제를 해결하기 위한 설정 (CNPG는 Operator가 관리하는 부분이므로, 별도의 initContainer 설정은 필요하지 않을 수 있습니다.)
+  # 그러나 만약 필요하다면, CNPG가 사용하는 기본 user/group ID를 고려하여 설정할 수 있습니다.
+  # postgresUID: -1 # 기본값인 26을 사용하거나 -1 (이미지 기본값) 사용
+  # postgresGID: -1
 
-  # -- 클러스터 초기화 시 생성할 데이터베이스와 소유자를 설정합니다.
-  # 기존 'auth.database', 'auth.username' 설정을 반영합니다.
+  # Bitnami의 shmVolume: enabled: true, sizeLimit: 1Gi 에 대응하는 설정은 CNPG에서는 명시적이지 않습니다.
+  # PostgreSQL 컨테이너는 대개 충분한 shared memory를 위해 tmpfs를 사용하므로,
+  # CNPG Pod 템플릿의 `volumes`와 `volumeMounts`를 커스텀해야 할 수 있지만,
+  # 일단 기본 설정으로 시작하고 필요하면 `cluster.template`을 통해 조정하는 것이 좋습니다.
+
+  # -- Nessie 카탈로그용 데이터베이스 및 사용자 생성 설정
+  # Bitnami의 'auth' 섹션에 해당
   initdb:
-    database: "nessiedb"
-    owner: "nessie_user"
-    # 'nessie_user'의 초기 패스워드를 담고 있는 Secret의 이름을 지정합니다.
-    # 이 Secret 또한 아래에서 직접 생성해야 합니다.
-    secret:
-      name: "nessie-user-password"
+    # Nessie 카탈로그용으로 자동 생성할 데이터베이스 이름
+    database: nessiedb
+    # 위 데이터베이스에 접근할 사용자 이름 (Owner)
+    owner: nessie_user # Bitnami의 'username'에 해당
+    # Owner의 비밀번호를 담을 Secret 이름. 비워두면 Operator가 자동으로 생성합니다.
+    secret: ""
+    # Owner의 비밀번호는 생성된 Secret에서 자동으로 관리되므로,
+    # Bitnami처럼 'password'를 직접 명시하지 않고 Secret을 사용해야 합니다.
 
-  # -- Pod Disruption Budget (PDB) 활성화 여부입니다.
-  # 인스턴스가 하나일 때는 비활성화하는 것이 안전합니다.
-  enablePDB: false
-
-# -- 백업 기능은 비활성화 상태로 둡니다. 필요시 S3 버킷 정보 등을 채우고 enabled: true로 변경하세요.
+# -- 백업 설정 (기존 Bitnami 설정에 백업 정보가 없으므로 비활성화)
 backups:
   enabled: false
 
-# -- PgBouncer 풀러는 사용하지 않으므로 비워둡니다.
+# -- PgBouncer는 기존 설정에 없으므로 비활성화 (Poolers 리스트를 비워둠)
 poolers: []
