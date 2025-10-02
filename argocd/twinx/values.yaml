@@ -196,7 +196,7 @@ applications:
       namespace: postgre
       syncWave: "10" # 오퍼레이터가 준비된 후 실행
       source:
-        path: "argocd/twinx/apps/cloudnativepg-cluster-resources" 
+        path: "argocd/twinx/apps/cloudnativepg-cluster-resource" 
 
     nessie:
       enabled: false
