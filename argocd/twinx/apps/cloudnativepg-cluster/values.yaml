@@ -1,8 +1,5 @@
-# 파일 경로: argocd/twinx/apps/cloudnativepg-cluster/values.yaml
-
 # ==============================================================================
-# CloudNativePG 'cluster' Helm Chart Values
-# 'nessiedb' 배포용으로 사용자의 요구사항에 맞춰 재구성된 파일입니다.
+# CloudNativePG 'cluster' Helm Chart Values (올바른 구조)
 # ==============================================================================
 
 # -- 클러스터의 기본 동작 모드
@@ -15,16 +12,13 @@ version:
   postgresql: "16"
 
 cluster:
-  # -- 클러스터의 인스턴스(Pod) 수. 이전 설정과 동일하게 1로 설정합니다.
+  # -- 클러스터의 인스턴스(Pod) 수
   instances: 1
 
   # -- PostgreSQL 클러스터의 초기 설정을 담당합니다. (Bootstrap)
   initdb:
-    # Nessie 카탈로그용으로 자동 생성할 데이터베이스 이름
     database: nessiedb
-    # 위 데이터베이스의 소유자가 될 사용자 이름
     owner: nessie_user
-    # 'nessie_user'의 암호를 저장할 Kubernetes Secret 설정
     secret:
       name: nessie-user-secret
 
@@ -33,22 +27,20 @@ cluster:
 
   # -- 데이터 영속성을 위한 스토리지 설정
   storage:
-    # PersistentVolumeClaim(PVC)의 크기
     size: 10Gi
-    # 클러스터에 존재하는 StorageClass 이름을 정확히 지정합니다.
     storageClass: "rook-ceph-block"
 
-  # -- 서비스 외부 노출 방식 설정
+  # -- ★★★ 올바른 서비스 외부 노출 방식 설정 ★★★
   # managed.services를 사용하여 서비스를 선언적으로 관리합니다.
   managed:
     services:
       # -rw (read-write) 파드에 연결되는 추가 서비스를 정의합니다.
       additional:
-        - selectorType: rw
+        - selectorType: rw  # 'primary' 인스턴스를 타겟으로 지정합니다.
           serviceTemplate:
             metadata:
-              # 생성될 서비스의 이름을 지정합니다.
-              name: "nessiedb-lb"
+              # 생성될 서비스의 이름을 지정합니다. (기본 서비스 이름과 겹치지 않게)
+              name: "nessiedb-loadbalancer"
             spec:
               # 서비스 타입을 LoadBalancer로 지정합니다.
               type: LoadBalancer
