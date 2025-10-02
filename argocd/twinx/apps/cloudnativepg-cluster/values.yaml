@@ -1,3 +1,5 @@
+# 파일 경로: argocd/twinx/apps/cloudnativepg-cluster/values.yaml
+
 # ==============================================================================
 # CloudNativePG 'cluster' Helm Chart Values
 # 'nessiedb' 배포용으로 사용자의 요구사항에 맞춰 재구성된 파일입니다.
@@ -37,12 +39,24 @@ cluster:
     storageClass: "rook-ceph-block"
 
   # -- 서비스 외부 노출 방식 설정
-  services:
-    # Primary(-rw) 서비스에 대한 설정
-    primary:
-      enabled: true
-      # 서비스를 LoadBalancer 타입으로 설정하여 외부 IP를 할당받습니다.
-      type: LoadBalancer
+  # managed.services를 사용하여 서비스를 선언적으로 관리합니다.
+  managed:
+    services:
+      # -rw (read-write) 파드에 연결되는 추가 서비스를 정의합니다.
+      additional:
+        - selectorType: rw
+          serviceTemplate:
+            metadata:
+              # 생성될 서비스의 이름을 지정합니다.
+              name: "nessiedb-lb"
+            spec:
+              # 서비스 타입을 LoadBalancer로 지정합니다.
+              type: LoadBalancer
+              ports:
+                - name: postgres
+                  port: 5432
+                  targetPort: 5432
+                  protocol: TCP
 
   # -- Pod의 리소스 요청량 및 최대 사용량 제한
   resources:
