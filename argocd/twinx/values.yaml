@@ -201,9 +201,9 @@ applications:
         - CreateNamespace=true
 
     nessie:
-      enabled: false
+      enabled: true
       namespace: nessie-ns
-      syncWave: "9" # PostgreSQL 이후에 배포되도록 설정
+      syncWave: "12" # PostgreSQL 이후에 배포되도록 설정
       source:
         type: helm
         repoURL: https://charts.projectnessie.org
@@ -217,9 +217,9 @@ applications:
         - CreateNamespace=true # ArgoCD가 네임스페이스를 자동으로 생성
 
     nessie-resources:
-      enabled: false
+      enabled: true
       namespace: nessie-ns
-      syncWave: "10" # nessie Helm 차트와 동시에 배포
+      syncWave: "13" # nessie Helm 차트와 동시에 배포
       source:
         path: "argocd/twinx/apps/nessie-resources"
         directory:
