@@ -9,7 +9,7 @@ metadata:
 spec:
   type: LoadBalancer
   selector:
-    cnpg.io/cluster: nessie-database
+    cnpg.io/cluster: cloudnative-pg-cluster
     cnpg.io/instanceRole: primary
   ports:
     - name: postgres
