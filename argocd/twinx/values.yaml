@@ -309,7 +309,7 @@ applications:
         - CreateNamespace=true # ArgoCD가 'superset' 네임스페이스를 자동으로 생성
 
     trino:
-      enabled: false
+      enabled: true
       namespace: trino # Trino 컴포넌트를 설치할 네임스페이스
       syncWave: "23"
       source:
