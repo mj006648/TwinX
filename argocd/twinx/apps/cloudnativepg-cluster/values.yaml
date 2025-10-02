@@ -1,3 +1,5 @@
+# 파일 경로: argocd/twinx/apps/cloudnativepg-cluster/values.yaml
+
 mode: standalone
 type: postgresql
 
@@ -7,12 +9,13 @@ version:
 cluster:
   instances: 1
   
-  initdb:
-    database: nessie_prod_db
-    owner: nessie_prod_user
-    # 'secret' 섹션을 'importSecret'으로 변경합니다.
-    importSecret:
-      name: nessie-prod-user-secret # 1단계에서 만든 Secret의 이름을 지정
+  # ★★★ 이 부분이 핵심입니다! 올바른 경로로 수정 ★★★
+  bootstrap:
+    initdb:
+      database: nessie_prod_db
+      owner: nessie_prod_user
+      importSecret:
+        name: nessie-prod-user-secret
 
   superuserSecret: "nessie-db-superuser-secret"
   storage:
