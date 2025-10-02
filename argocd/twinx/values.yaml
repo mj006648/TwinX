@@ -177,13 +177,14 @@ applications:
         - ServerSideApply=true
 
     cloudnative-pg-cluster:
-      enabled: false
+      enabled: true
       namespace: postgre
-      syncWave: "9" # 오퍼레이터가 준비된 후 실행
+      syncWave: "10" # 오퍼레이터가 준비된 후 실행
       source:
         type: helm
         repoURL: https://cloudnative-pg.github.io/charts
         chart: cluster
+        releaseName: nessie-database
         targetRevision: "0.3.1"
         helm:
           valueFiles:
@@ -192,9 +193,9 @@ applications:
         - CreateNamespace=true
 
     cloudnative-pg-resources:
-      enabled: false
+      enabled: true
       namespace: postgre
-      syncWave: "10" # 오퍼레이터가 준비된 후 실행
+      syncWave: "9" # 오퍼레이터가 준비된 후 실행
       source:
         path: "argocd/twinx/apps/cloudnativepg-cluster-resource" 
 
