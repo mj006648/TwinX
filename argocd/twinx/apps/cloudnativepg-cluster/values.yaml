@@ -12,140 +12,60 @@ namespaceOverride: ""
 type: postgresql
 
 version:
-  # -- PostgreSQL major version to use (Bitnami 설정: 16)
   postgresql: "16"
-  # -- If using TimescaleDB, specify the version
   timescaledb: "2.15"
-  # -- If using PostGIS, specify the version
   postgis: "3.4"
 
 ###
 # -- Cluster mode of operation.
 mode: standalone
 
-recovery: {} # 복구 관련 설정은 비워둡니다.
+recovery: {}
 
 cluster:
-  # -- Number of instances (Bitnami 설정: 1)
   instances: 1
 
-  # -- Name of the container image, supporting both tags (<image>:<tag>) and digests
-  imageName: "" 
-
-  # -- Reference to `ImageCatalog` of `ClusterImageCatalog`
-  imageCatalogRef: {}
-
-  # -- Image pull policy
-  imagePullPolicy: IfNotPresent
-
-  # -- The list of pull secrets
-  imagePullSecrets: []
-
-  # -- PersistentVolumeClaim(PVC) 설정 (Bitnami persistence 대응)
   storage:
-    size: 10Gi # Bitnami 설정: 10Gi
-    storageClass: "rook-ceph-block" # Bitnami 설정: rook-ceph-block
+    size: 10Gi
+    storageClass: "rook-ceph-block"
 
-  # -- WAL Storage 설정 (비활성화 유지)
   walStorage:
     enabled: false
-    size: 1Gi
-    storageClass: ""
 
-  # -- The UID/GID of the postgres user
-  postgresUID: -1
-  postgresGID: -1
-
-  # -- Customization of service definitions. (이전 오류 발생 부분: Object 타입으로 수정)
-  services:
-    # Primary (read-write) 서비스에 LoadBalancer 타입 적용 (Bitnami service type 대응)
-    primary:
-      type: LoadBalancer
-    # replica 서비스는 기본값(ClusterIP)을 사용하거나 비워둡니다.
-
-  # -- Resources requirements (Bitnami resources 대응)
   resources:
     limits:
-      cpu: "1" # Bitnami limit: 1
-      memory: "1Gi" # Bitnami limit: 1Gi
+      cpu: "1"
+      memory: "1Gi"
     requests:
-      cpu: "250m" # Bitnami request: 250m
-      memory: "512Mi" # Bitnami request: 512Mi
+      cpu: "250m"
+      memory: "512Mi"
 
-  priorityClassName: ""
+  # LoadBalancer 설정 (이전 오류 해결)
+  services:
+    primary:
+      type: LoadBalancer
 
-  primaryUpdateMethod: switchover
-  primaryUpdateStrategy: unsupervised
-
-  logLevel: "info"
-
-  affinity:
-    topologyKey: topology.kubernetes.io/zone
-
-  certificates: {}
-
-  # -- Superuser 비밀번호 관리 활성화 (CNPG가 Secret 자동 생성)
   enableSuperuserAccess: true
   superuserSecret: ""
 
-  # -- Allow to disable PDB (단일 인스턴스를 위해 PDB 비활성화)
   enablePDB: false
 
-  # -- Declarative Role Management (4단계 스키마 생성을 위해 nessie_prod_user 역할 생성)
+  # Declarative Role Management
   roles:
     - name: nessie_prod_user
       ensure: present
       login: true
       superuser: false
-    # 기존 주석은 제거
 
-  monitoring:
-    enabled: false
-    podMonitor:
-      enabled: true
-      relabelings: []
-      metricRelabelings: []
-    prometheusRule:
-      enabled: true
-      excludeRules: []
-    disableDefaultQueries: false
-    customQueries: []
-    customQueriesSecret: []
-
-  postgresql:
-    parameters: {}
-    synchronous: {}
-    pg_hba: []
-    pg_ident: []
-    shared_preload_libraries: []
-    ldap: {}
-
-
-  # -- BootstrapInitDB is the configuration of the bootstrap process (Bitnami auth 대응)
+  # BootstrapInitDB configuration
   initdb:
-    # database: app
-    database: nessiedb # Bitnami database: nessiedb
-    # owner: "" # Defaults to the database name
-    owner: nessie_user # Bitnami username: nessie_user
-    # secret: name: "" # Owner의 비밀번호 Secret을 Operator가 자동으로 생성
-    secret: ""
-    # options: []
-    # encoding: UTF8
-    # postInitSQL:
-    # postInitApplicationSQL: []
-    # postInitTemplateSQL: []
+    database: nessiedb
+    owner: nessie_user
+    # secret 필드를 제거하여 CNPG가 Secret을 자동으로 생성하도록 함.
+    # secret: ""  <-- 이 줄이 오류를 유발했으므로 제거됨
 
-  # -- Configure the metadata of the generated service account
-  serviceAccountTemplate: {}
-
-  additionalLabels: {}
-  annotations: {}
-
-
+# ... (나머지 필드는 변경 없음)
 backups:
-  # -- Backups are disabled by default. (기존 설정에 백업 정보 없음)
   enabled: false
-  # ... (나머지 백업 필드는 기본값/빈 값 유지) ...
 
-# -- List of PgBouncer poolers (기존 설정에 없으므로 비활성화 유지)
 poolers: []
