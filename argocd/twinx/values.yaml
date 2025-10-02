@@ -181,7 +181,7 @@ applications:
       namespace: postgre
       syncWave: "9" # 오퍼레이터가 준비된 후 실행
       source:
-        path: "argocd/twinx/apps/cloudnativepg-cluster-secret" 
+        path: "argocd/twinx/apps/cloudnativepg-secret" 
       syncOptions:
         - CreateNamespace=true
 
@@ -199,13 +199,6 @@ applications:
             - "argocd/twinx/apps/cloudnativepg-cluster/values.yaml"
       syncOptions:
         - CreateNamespace=true
-
-    cloudnative-pg-resources:
-      enabled: false
-      namespace: postgre
-      syncWave: "11" # 오퍼레이터가 준비된 후 실행
-      source:
-        path: "argocd/twinx/apps/cloudnativepg-cluster-resource" 
 
     nessie:
       enabled: false

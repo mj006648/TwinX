@@ -1,26 +1,19 @@
 # 파일 경로: argocd/twinx/apps/cloudnativepg-cluster/values.yaml
 
-mode: standalone
-type: postgresql
-
+# -- PostgreSQL 버전을 지정합니다.
 version:
   postgresql: "16"
 
-cluster:
-  instances: 1
-  
-  # ★★★ 이 부분이 핵심입니다! 올바른 경로로 수정 ★★★
-  bootstrap:
-    initdb:
-      database: nessie_prod_db
-      owner: nessie_prod_user
-      importSecret:
-        name: nessie-prod-user-secret
+# -- 클러스터 운영 모드를 'standalone'으로 설정하여 단일 인스턴스를 생성합니다.
+mode: standalone
 
-  superuserSecret: "nessie-db-superuser-secret"
-  storage:
-    size: 10Gi
-    storageClass: "rook-ceph-block"
+cluster:
+  # -- 인스턴스 개수입니다. 기존 Bitnami 차트의 'architecture: standalone' 설정과 동일합니다.
+  instances: 1
+
+  # -- Pod의 리소스 요청 및 제한 설정입니다. 기존 Bitnami 설정을 그대로 가져옵니다.
+  # Guaranteed QoS를 위해 requests와 limits를 동일하게 설정하는 것을 권장하지만,
+  # 여기서는 기존 설정을 유지했습니다.
   resources:
     requests:
       cpu: "250m"
@@ -29,5 +22,38 @@ cluster:
       cpu: "1"
       memory: "1Gi"
 
+  # -- 데이터 영속성을 위한 스토리지 설정입니다. 기존 Bitnami 설정을 그대로 가져옵니다.
+  storage:
+    size: 10Gi
+    storageClass: "rook-ceph-block"
+
+  # -- 서비스를 외부로 노출하기 위한 설정입니다.
+  # 기존 'primary.service.type: LoadBalancer' 설정을 반영합니다.
+  services:
+    primary:
+      type: LoadBalancer
+
+  # -- PostgreSQL 슈퍼유저(postgres)의 패스워드를 관리할 Secret의 이름을 지정합니다.
+  # 이 Secret은 아래에서 직접 생성해야 합니다.
+  superuserSecret: "postgres-superuser-password"
+
+  # -- 클러스터 초기화 시 생성할 데이터베이스와 소유자를 설정합니다.
+  # 기존 'auth.database', 'auth.username' 설정을 반영합니다.
+  initdb:
+    database: "nessiedb"
+    owner: "nessie_user"
+    # 'nessie_user'의 초기 패스워드를 담고 있는 Secret의 이름을 지정합니다.
+    # 이 Secret 또한 아래에서 직접 생성해야 합니다.
+    secret:
+      name: "nessie-user-password"
+
+  # -- Pod Disruption Budget (PDB) 활성화 여부입니다.
+  # 인스턴스가 하나일 때는 비활성화하는 것이 안전합니다.
+  enablePDB: false
+
+# -- 백업 기능은 비활성화 상태로 둡니다. 필요시 S3 버킷 정보 등을 채우고 enabled: true로 변경하세요.
 backups:
   enabled: false
+
+# -- PgBouncer 풀러는 사용하지 않으므로 비워둡니다.
+poolers: []
