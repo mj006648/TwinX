@@ -388,4 +388,4 @@ applications:
       namespace: omni-streaming
       syncWave: "29"
       source:
-        path: "argocd/twinx/apps/ovas/02-auth/omniverse-repo.yaml"
+        path: "argocd/twinx/apps/ovas/02-auth/ngc-omni-user"
