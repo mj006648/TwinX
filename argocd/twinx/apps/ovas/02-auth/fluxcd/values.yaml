@@ -1,0 +1,36 @@
+# ./argocd/twinx/apps/ovas/02-auth/fluxcd/values.yaml
+helmController:
+  create: true
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: NodeGroup
+            operator: In
+            values:
+            - gpu
+imageAutomationController:
+  create: false
+kustomizeController:
+  create: false
+notificationController:
+  create: false
+imageReflectionController:
+  create: false
+policies:
+  create: false
+rbac:
+  create: true
+sourceController:
+  create: true
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: NodeGroup
+            operator: In
+            values:
+            - gpu
+

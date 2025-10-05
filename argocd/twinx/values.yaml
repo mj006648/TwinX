@@ -358,7 +358,7 @@ applications:
     memcached-service-r3:
       enabled: true
       namespace: omni-streaming
-      syncWave: "37"
+      syncWave: "27"
       source:
         type: helm
         repoURL: https://charts.bitnami.com/bitnami
@@ -368,3 +368,17 @@ applications:
           releaseName: memcached-service-r3
           valueFiles:
             - "argocd/twinx/apps/ovas/01-infra/memcached/values.yaml"
+
+    fluxcd:
+      enabled: true
+      namespace: flux-operators
+      syncWave: "28"
+      source:
+        type: helm
+        repoURL: https://fluxcd-community.github.io/helm-charts
+        chart: flux2
+        targetRevision: 2.16.4
+        helm:
+          releaseName: fluxcd
+          valueFiles:
+            - "argocd/twinx/apps/ovas/02-auth/fluxcd/values.yaml"
