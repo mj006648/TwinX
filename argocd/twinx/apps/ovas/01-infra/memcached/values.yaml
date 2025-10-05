@@ -1,0 +1,47 @@
+# ./argocd/twinx/apps/ovas/01-infra/memcached/values.yaml
+# Bitnami 이미지가 아닌 Memcached 공식 이미지를 사용하도록 설정을 변경합니다.
+# 이렇게 하면 Bitnami의 정책 변경이나 유료화에 영향을 받지 않습니다.
+image:
+  registry: docker.io
+  repository: memcached  # 'bitnami/memcached'에서 공식 이미지 'memcached'로 변경
+  tag: 1.6.24-alpine     # 공식 이미지의 안정적인 최신 태그 (가벼운 alpine 버전)
+  pullPolicy: IfNotPresent
+
+# --- 아래는 사용자님의 OVAs 배포를 위해 설정한 값들입니다 ---
+
+# Memcached 공식 이미지의 실행 인수에 맞게 수정합니다.
+# Bitnami의 /run.sh 스크립트를 사용하지 않고 memcached 데몬을 직접 실행합니다.
+args:
+  - memcached            # 실행할 명령어
+  - -m 10240             # 최대 메모리 10GB (단위 'm' 제거)
+  - -I 1024M             # 최대 아이템 크기 1GB (단위를 'm'에서 'M'으로 변경)
+  - -c 2000              # 최대 연결 수 (기존 extraEnvVars에서 이동)
+  - -t 8                 # 스레드 수 (기존 extraEnvVars에서 이동)
+
+# 리소스 요청 및 제한 설정 (고성능 환경을 위함)
+resources:
+  limits:
+    memory: 20Gi
+    cpu: 4
+  requests:
+    memory: 10Gi
+    cpu: 2
+
+# extraEnvVars는 Bitnami 이미지 전용이므로 공식 이미지에서는 사용되지 않습니다.
+# 해당 설정들은 위 'args' 부분으로 통합되었으므로 이 섹션은 삭제하거나 주석 처리합니다.
+# extraEnvVars: []
+
+# 특정 노드 그룹에 Pod를 할당하기 위한 nodeSelector
+nodeSelector:
+  NodeGroup: gpu
+
+# 복제본 수
+replicaCount: 1
+
+# Headless Service로 만들기 위한 설정 (고가용성 아키텍처에서 흔히 사용)
+service:
+  clusterIP: None
+
+# 아키텍처 설정 (이 설정은 Bitnami 차트의 특정 로직을 위한 것일 수 있으나,
+# 기본 Pod/Service 생성에는 영향을 주지 않으므로 유지해도 괜찮습니다.)
+architecture: high-availability

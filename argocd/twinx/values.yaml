@@ -327,7 +327,7 @@ applications:
         # trino 네임스페이스가 없다면 ArgoCD가 자동으로 생성합니다.
         - CreateNamespace=true
 
-    ovas-ingress-nginx:
+    ingress-nginx:
       enabled: true
       namespace: ingress-nginx
       syncWave: "25"
@@ -341,7 +341,7 @@ applications:
           valueFiles:
             - "argocd/twinx/apps/ovas/01-infra/ingress-nginx/values.yaml"
 
-    ovas-ingress-nginx-streaming:
+    ingress-nginx-streaming:
       enabled: true
       namespace: ingress-nginx
       syncWave: "26"
