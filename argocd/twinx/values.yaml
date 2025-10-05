@@ -354,3 +354,17 @@ applications:
           releaseName: ingress-nginx-streaming
           valueFiles:
             - "argocd/twinx/apps/ovas/01-infra/ingress-nginx-streaming/values.yaml"
+
+    memcached-service-r3:
+      enabled: true
+      namespace: omni-streaming
+      syncWave: "37"
+      source:
+        type: helm
+        repoURL: https://charts.bitnami.com/bitnami
+        chart: memcached
+        targetRevision: 7.9.7
+        helm:
+          releaseName: memcached-service-r3
+          valueFiles:
+            - "argocd/twinx/apps/ovas/01-infra/memcached/values.yaml"
