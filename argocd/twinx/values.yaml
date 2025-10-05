@@ -389,3 +389,45 @@ applications:
       syncWave: "29"
       source:
         path: "argocd/twinx/apps/ovas/02-auth/ngc-omni-user"
+
+    rmcp:
+      enabled: true
+      namespace: omni-streaming
+      syncWave: "30"
+      source:
+        type: helm
+        repoURL: https://helm.ngc.nvidia.com/nvidia/omniverse
+        chart: kit-appstreaming-rmcp
+        targetRevision: 1.10.1
+        helm:
+          releaseName: rmcp
+          valueFiles:
+            - "argocd/twinx/apps/ovas/03-core-services/rmcp/values.yaml"
+
+    streaming:
+      enabled: true
+      namespace: omni-streaming
+      syncWave: "31"
+      source:
+        type: helm
+        repoURL: https://helm.ngc.nvidia.com/nvidia/omniverse
+        chart: kit-appstreaming-manager
+        targetRevision: 1.10.1
+        helm:
+          releaseName: streaming
+          valueFiles:
+            - "argocd/twinx/apps/ovas/03-core-services/streaming-manager/values.yaml"
+
+    applications:
+      enabled: true
+      namespace: omni-streaming
+      syncWave: "32"
+      source:
+        type: helm
+        repoURL: https://helm.ngc.nvidia.com/nvidia/omniverse
+        chart: kit-appstreaming-applications
+        targetRevision: 1.10.1
+        helm:
+          releaseName: applications
+          valueFiles:
+            - "argocd/twinx/apps/ovas/03-core-services/applications-ui/values.yaml" 
