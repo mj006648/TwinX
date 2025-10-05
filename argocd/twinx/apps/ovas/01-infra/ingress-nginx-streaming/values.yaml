@@ -1,0 +1,8 @@
+# ./argocd/twinx/apps/ovas/01-infra/ingress-nginx-streaming/values.yaml
+controller:
+  replicaCount: 1
+  ingressClass: nginx-streaming
+  ingressClassResource:
+    name: nginx-streaming
+    default: false
+  electionID: ingress-nginx-streaming-leader

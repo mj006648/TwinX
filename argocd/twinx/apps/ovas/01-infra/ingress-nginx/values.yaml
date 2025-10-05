@@ -1,0 +1,7 @@
+# ./argocd/twinx/apps/ovas/01-infra/ingress-nginx/values.yaml
+controller:
+  replicaCount: 1
+  ingressClassResource:
+    name: nginx
+    default: true
+  electionID: ingress-nginx-leader
