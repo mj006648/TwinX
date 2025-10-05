@@ -1,0 +1,44 @@
+# ./argocd/twinx/apps/ovas/05-web-viewer/web-viewer-sample.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: omniverse-viewer-deployment
+  namespace: omni-streaming
+  labels:
+    app: omniverse-viewer
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: omniverse-viewer
+  template:
+    metadata:
+      labels:
+        app: omniverse-viewer
+    spec:
+      containers:
+      - name: viewer-container
+        image: "ich6648/ovas-web-viewer:1.0.0"
+        ports:
+        - containerPort: 80
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "250m"
+          limits:
+            memory: "256Mi"
+            cpu: "500m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: omniverse-viewer-service
+  namespace: omni-streaming
+spec:
+  type: LoadBalancer
+  selector:
+    app: omniverse-viewer
+  ports:
+  - port: 80
+    targetPort: 80
+    protocol: TCP

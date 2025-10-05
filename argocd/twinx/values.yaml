@@ -431,3 +431,17 @@ applications:
           releaseName: applications
           valueFiles:
             - "argocd/twinx/apps/ovas/03-core-services/applications-ui/values.yaml" 
+
+    ovas-app-definitions:
+      enabled: true
+      namespace: omni-streaming
+      syncWave: "33"
+      source:
+        path: "argocd/twinx/apps/ovas/04-app-definitions"
+
+    ovas-web-viewer:
+      enabled: true
+      namespace: omni-streaming
+      syncWave: "34"
+      source:
+        path: "argocd/twinx/apps/ovas/05-web-viewer"

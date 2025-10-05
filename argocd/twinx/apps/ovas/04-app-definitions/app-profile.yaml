@@ -1,0 +1,39 @@
+# ./argocd/twinx/apps/ovas/04-app-definitions/app-profile.yaml
+apiVersion: omniverse.nvidia.com/v1
+kind: ApplicationProfile
+metadata:
+  name: sample
+spec:
+  name: sample profile
+  description: Updated memory and CPU settings.
+  supportedApplications:
+    - name: "usd-viewer"
+      versions:
+        - "*"
+  chartMappings:
+    container: streamingKit.image.repository
+    container_version: streamingKit.image.tag
+    name: streamingKit.name
+  chartValues:
+    global:
+      imagePullSecrets:
+        - name: regcred
+    streamingKit:
+      image:
+        repository: nvcr.io/nvidia/omniverse/usd-viewer
+        pullPolicy: Always
+        tag: '107.3.1'
+      sessionId: session_id
+      name: kit-app
+      service:
+        type: "LoadBalancer"
+      resources:
+        limits:
+          cpu: "8"
+          memory: "30Gi"
+          nvidia.com/gpu: "1"
+        requests:
+          nvidia.com/gpu: "1"
+      env:
+        - name: USD_PATH
+          value: "'${omni.usd_viewer.samples}/samples_data/stage01.usd'"
