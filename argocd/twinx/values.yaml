@@ -382,3 +382,10 @@ applications:
           releaseName: fluxcd
           valueFiles:
             - "argocd/twinx/apps/ovas/02-auth/fluxcd/values.yaml"
+
+     ovas-omniverse-repo:
+       enabled: true
+       namespace: omni-streaming
+       syncWave: "29"
+       source:
+         path: "argocd/twinx/apps/ovas/02-auth/omniverse-repo.yaml"
