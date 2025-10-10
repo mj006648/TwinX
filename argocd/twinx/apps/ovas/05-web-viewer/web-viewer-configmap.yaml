@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: omniverse-viewer-config
+  namespace: omni-streaming
+data:
+  config.js: |
+    window.config = {
+      // Streaming Manager 서비스의 외부 IP 주소를 정확히 입력합니다.
+      STREAMING_SERVER_URL: 'http://10.38.38.203',
+      POLLING_INTERVAL: 3000
+    };
