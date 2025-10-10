@@ -1,0 +1,50 @@
+# ./argocd/twinx/apps/ovas/04-app-definitions/isaac-sim-app-profile.yaml
+apiVersion: omniverse.nvidia.com/v1
+kind: ApplicationProfile
+metadata:
+  name: isaac-sim-omni-connect
+spec:
+  name: Isaac Sim with Omni Connection
+  description: High-performance profile for Isaac Sim with pre-configured Omniverse connection.
+  supportedApplications:
+    - name: "isaac-sim" # isaac-sim-app.yaml의 name과 일치
+      versions:
+        - "*"
+  chartMappings:
+    container: streamingKit.image.repository
+    container_version: streamingKit.image.tag
+    name: streamingKit.name
+  chartValues:
+    global:
+      imagePullSecrets:
+        - name: regcred
+    streamingKit:
+      # --- Docker 환경 변수 (-e) 반영 ---
+      env:
+        - name: OMNI_SERVER
+          value: "omniverse://10.38.38.32"
+        - name: OMNI_USER
+          value: "admin"
+        - name: OMNI_PASS 
+          value: "0070" 
+        - name: ACCEPT_EULA
+          value: "Y"
+        - name: PRIVACY_CONSENT
+          value: "Y"
+          
+      # --- Docker 리소스 (--gpus) 반영 ---
+      resources:
+        limits:
+          cpu: "12" 
+          memory: "48Gi" 
+          nvidia.com/gpu: "1" 
+        requests:
+          nvidia.com/gpu: "1"
+          
+      args:
+        - --exts.kit.app.streaming.enabled=true
+        - --exts.kit.app.streaming.viewport.enabled=true
+        - --exts.kit.app.streaming.gui.enabled=true
+
+      nodeSelector:
+        NodeGroup: gpu

@@ -1,0 +1,11 @@
+# ./argocd/twinx/apps/ovas/04-app-definitions/isaac-sim-app.yaml
+apiVersion: omniverse.nvidia.com/v1
+kind: Application
+metadata:
+  name: isaac-sim
+  labels:
+    robotics: "true"
+    simulation: "true"
+spec:
+  name: NVIDIA Isaac Sim
+  description: Robotics Simulation Platform built on Omniverse.
