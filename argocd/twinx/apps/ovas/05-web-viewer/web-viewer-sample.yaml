@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: viewer-container
-        image: "ich6648/ovas-web-viewer:1.0.1" # 사용 중인 이미지로 유지
+        image: "ich6648/ovas-web-viewer:1.0.2" # 사용 중인 이미지로 유지
         ports:
         - containerPort: 80
         resources:
