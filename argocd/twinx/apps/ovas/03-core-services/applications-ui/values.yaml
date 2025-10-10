@@ -23,6 +23,12 @@ applications:
     path: "/"
     pathType: Prefix
     enabled: true
+    # --- [global에 있던 CORS 설정을 여기에 한 번 더 추가합니다] ---
+    annotations:
+      nginx.ingress.kubernetes.io/enable-cors: "true"
+      nginx.ingress.kubernetes.io/cors-allow-origin: "*"
+      nginx.ingress.kubernetes.io/cors-allow-methods: "GET, POST, OPTIONS, PUT, DELETE"
+      nginx.ingress.kubernetes.io/cors-allow-headers: "Content-Type, Authorization"
 
   serviceConfig:
     root_path: ""
@@ -33,11 +39,3 @@ applications:
     repository: "nvcr.io/nvidia/omniverse/kit-appstreaming-applications"
     pullPolicy: Always
     tag: 1.10.1
-
-  applications: {}
-  profiles: {}
-
-  monitoring:
-    enabled: false
-    prometheusNamespace: "monitoring"
-
