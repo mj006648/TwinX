@@ -20,7 +20,7 @@ applications:
   ingress:
     # === 가장 중요한 변경점 ===
     # 루트('/') 경로 대신 이 애플리케이션의 고유 경로를 지정하여 충돌을 방지합니다.
-    path: "/"
+    path: "/cfg/apps"
     pathType: Prefix
     enabled: true
 
