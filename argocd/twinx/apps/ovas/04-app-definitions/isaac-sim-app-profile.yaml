@@ -19,6 +19,10 @@ spec:
       imagePullSecrets:
         - name: regcred
     streamingKit:
+      # --- service 타입을 LoadBalancer로 지정하여 세션마다 외부 IP를 할당 (추가된 부분) ---
+      service:
+        type: "LoadBalancer"
+
       # --- Docker 환경 변수 (-e) 반영 ---
       env:
         - name: OMNI_SERVER
