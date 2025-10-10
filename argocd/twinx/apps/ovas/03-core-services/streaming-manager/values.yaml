@@ -42,14 +42,12 @@ streaming:
 
     # --- 도메인 및 TLS가 없는 환경을 위한 설정 ---
     # backend_csp_cls는 Generic으로 유지하고, backend_csp_args를 수정합니다.
-    backend_csp_cls: "nv.svc.streaming._csp.Generic"
+    backend_csp_cls: "nv.svc.streaming._csp.Ingress"
     backend_csp_args:
       # wss (보안 웹소켓)를 비활성화합니다.
       enable_wss: false
       # base_domain을 빈 값으로 설정합니다잇
       base_domain: ""
-      host: "10.38.38.203"  # ⬅️ 스트리밍 Ingress IP
-      port: 80              # ⬅️ Ingress 포트 (80)
 
   image:
     repository: "nvcr.io/nvidia/omniverse/kit-appstreaming-manager"
