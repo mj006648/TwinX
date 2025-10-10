@@ -37,7 +37,7 @@ streaming:
 
     session_namespace: "omni-streaming"
     session_capacity: 5
-    backend_rmcp_url: "http://10.38.38.200/rmcp"
+    backend_rmcp_url: "http://rmcp/rmcp"
     backend_applications_resolver_url: "http://resolver"
 
     # --- 도메인 및 TLS가 없는 환경을 위한 설정 ---
