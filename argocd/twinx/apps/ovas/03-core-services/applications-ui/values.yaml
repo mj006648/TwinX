@@ -20,14 +20,14 @@ applications:
   ingress:
     # === 가장 중요한 변경점 ===
     # 루트('/') 경로 대신 이 애플리케이션의 고유 경로를 지정하여 충돌을 방지합니다.
-    path: "/applications"
+    path: "/"
     pathType: Prefix
     enabled: true
 
   serviceConfig:
     root_path: ""
     # 위 ingress.path와 이 prefix_url이 일치하는 것이 좋습니다.
-    prefix_url: "/applications"
+    prefix_url: "cfg/apps"
 
   image:
     repository: "nvcr.io/nvidia/omniverse/kit-appstreaming-applications"
