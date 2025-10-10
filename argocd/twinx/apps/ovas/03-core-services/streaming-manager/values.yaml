@@ -48,6 +48,8 @@ streaming:
       enable_wss: false
       # base_domain을 빈 값으로 설정합니다잇
       base_domain: ""
+      host: "10.38.38.203"  # ⬅️ 스트리밍 Ingress IP
+      port: 80              # ⬅️ Ingress 포트 (80)
 
   image:
     repository: "nvcr.io/nvidia/omniverse/kit-appstreaming-manager"
