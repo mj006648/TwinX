@@ -21,11 +21,6 @@ spec:
         image: "ich6648/ovas-web-viewer:1.0.0"
         ports:
         - containerPort: 80
-        # ⬅️ 이 env 섹션을 추가합니다.
-        env: 
-        - name: OMNI_APP_CONFIG_URL
-          # Applications UI Ingress Controller의 EXTERNAL-IP (10.38.38.200)를 지정합니다.
-          value: "http://10.38.38.200/cfg/apps" 
         resources:
           requests:
             memory: "128Mi"
