@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
       - name: viewer-container
-        image: "ich6648/ovas-web-viewer:1.0.9"
+        image: "ich6648/ovas-web-viewer:1.0.10"
         ports:
         - containerPort: 80
         resources:
