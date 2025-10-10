@@ -27,7 +27,7 @@ applications:
   serviceConfig:
     root_path: ""
     # 위 ingress.path와 이 prefix_url이 일치하는 것이 좋습니다.
-    prefix_url: "cfg/apps"
+    prefix_url: ""
 
   image:
     repository: "nvcr.io/nvidia/omniverse/kit-appstreaming-applications"
