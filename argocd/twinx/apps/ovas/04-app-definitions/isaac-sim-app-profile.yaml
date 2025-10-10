@@ -7,7 +7,7 @@ spec:
   name: Isaac Sim with Omni Connection
   description: High-performance profile for Isaac Sim with pre-configured Omniverse connection.
   supportedApplications:
-    - name: "isaac-sim" # isaac-sim-app.yaml의 name과 일치
+    - name: "isaac-sim"
       versions:
         - "*"
   chartMappings:
@@ -19,33 +19,37 @@ spec:
       imagePullSecrets:
         - name: regcred
     streamingKit:
-      # --- service 타입을 LoadBalancer로 지정하여 세션마다 외부 IP를 할당 (추가된 부분) ---
       service:
         type: "LoadBalancer"
 
-      # --- Docker 환경 변수 (-e) 반영 ---
+      # --- Docker의 "-e" (환경 변수) 부분을 여기에 반영 ---
       env:
+        - name: ACCEPT_EULA
+          value: "Y"
+        - name: PRIVACY_CONSENT
+          value: "Y"
         - name: OMNI_SERVER
           value: "omniverse://10.38.38.32"
         - name: OMNI_USER
           value: "admin"
         - name: OMNI_PASS 
           value: "0070" 
-        - name: ACCEPT_EULA
-          value: "Y"
-        - name: PRIVACY_CONSENT
-          value: "Y"
           
-      # --- Docker 리소스 (--gpus) 반영 ---
+      # --- Docker의 "--gpus" (리소스) 부분을 여기에 반영 ---
       resources:
         limits:
           cpu: "12" 
           memory: "48Gi" 
+          # docker run 명령어에서 3개의 GPU를 요청했으므로 "3"으로 설정
           nvidia.com/gpu: "1" 
         requests:
+          # 요청과 한도를 동일하게 맞추는 것이 안정적입니다.
           nvidia.com/gpu: "1"
           
+      # --- Docker의 Entrypoint/CMD 부분을 여기에 반영 ---
+      # 스트리밍을 위한 헤드리스 실행(no-window)이 핵심입니다.
       args:
+        - --no-window
         - --exts.kit.app.streaming.enabled=true
         - --exts.kit.app.streaming.viewport.enabled=true
         - --exts.kit.app.streaming.gui.enabled=true
