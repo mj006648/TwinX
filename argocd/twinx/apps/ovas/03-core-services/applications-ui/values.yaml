@@ -1,25 +1,34 @@
 # ./argocd/twinx/apps/ovas/03-core-services/applications-ui/values.yaml
+
+# global 섹션에는 다른 앱들과 공통으로 사용하는 설정만 남깁니다.
+# ingress.annotations는 applications 섹션으로 이동했으므로 여기서는 제거합니다.
 global:
-  ingress:
-    annotations:
-      nginx.ingress.kubernetes.io/proxy-body-size: "0"
-      nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
-      nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
-      # Ingress Controller를 NGINX로 지정합니다.
-      className: nginx
-      kubernetes.io/ingress.class: "nginx"
-      nginx.ingress.kubernetes.io/enable-cors: "true"
-      nginx.ingress.kubernetes.io/cors-allow-origin: "*"
-      nginx.ingress.kubernetes.io/cors-allow-methods: "GET, POST, OPTIONS, PUT, DELETE"
-      nginx.ingress.kubernetes.io/cors-allow-headers: "Content-Type, Authorization"
-  # 레지스트리 시크릿은 그대로 사용합니다.
+  # 레지스트리 시크릿은 모든 OVAS 앱이 사용하므로 여기에 둡니다.
   imagePullSecrets:
    - name: regcred
 
 applications:
   ingress:
-    # === 가장 중요한 변경점 ===
-    # 루트('/') 경로 대신 이 애플리케이션의 고유 경로를 지정하여 충돌을 방지합니다.
+    # =======================================================================
+    # 🚨 여기에 'annotations' 블록을 새로 만들어 모든 관련 설정을 위치시킵니다.
+    # 이렇게 해야 applications-ui Ingress에 CORS 정책이 올바르게 적용됩니다.
+    annotations:
+      # Ingress Controller를 NGINX로 지정
+      kubernetes.io/ingress.class: "nginx"
+      
+      # CORS (Cross-Origin Request Blocked) 오류 해결을 위한 설정
+      nginx.ingress.kubernetes.io/enable-cors: "true"
+      nginx.ingress.kubernetes.io/cors-allow-origin: "*"
+      nginx.ingress.kubernetes.io/cors-allow-methods: "GET, POST, OPTIONS, PUT, DELETE"
+      nginx.ingress.kubernetes.io/cors-allow-headers: "Content-Type, Authorization"
+
+      # 기타 NGINX 관련 설정
+      nginx.ingress.kubernetes.io/proxy-body-size: "0"
+      nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
+      nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
+    # =======================================================================
+
+    # OVAS의 기본 API 경로
     path: "/cfg/apps"
     pathType: Prefix
     enabled: true
@@ -40,4 +49,3 @@ applications:
   monitoring:
     enabled: false
     prometheusNamespace: "monitoring"
-
