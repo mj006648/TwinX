@@ -47,7 +47,7 @@ streaming:
       # wss (보안 웹소켓)를 비활성화합니다.
       enable_wss: false
       # base_domain을 빈 값으로 설정합니다.
-      base_domain: ""
+      base_domain: "10.38.38.203"
 
   image:
     repository: "nvcr.io/nvidia/omniverse/kit-appstreaming-manager"
