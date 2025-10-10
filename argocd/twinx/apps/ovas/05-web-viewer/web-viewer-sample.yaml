@@ -25,7 +25,7 @@ spec:
         env: 
         - name: OMNI_APP_CONFIG_URL
           # Applications UI Ingress Controller의 EXTERNAL-IP (10.38.38.200)를 지정합니다.
-          value: "http://10.38.38.200" 
+          value: "http://10.38.38.200/applications" 
         resources:
           requests:
             memory: "128Mi"
