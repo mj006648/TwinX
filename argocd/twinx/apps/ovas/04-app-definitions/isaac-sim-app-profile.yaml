@@ -9,7 +9,7 @@ spec:
   supportedApplications:
     - name: "isaac-sim" # isaac-sim-app.yaml의 name과 일치
       versions:
-        - "*"
+        - "5.0.0"
   chartMappings:
     container: streamingKit.image.repository
     container_version: streamingKit.image.tag
