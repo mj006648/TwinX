@@ -21,6 +21,11 @@ spec:
         image: "ich6648/ovas-web-viewer:1.0.0"
         ports:
         - containerPort: 80
+        # ⬅️ 이 env 섹션을 추가해야 합니다! ⬅️
+        env: 
+        - name: OMNI_APP_CONFIG_URL
+          # Applications UI Ingress IP와 통일된 API 경로(/applications) 및 API 버전(/v1) 명시
+          value: "http://10.38.38.200/applications/v1" 
         resources:
           requests:
             memory: "128Mi"
