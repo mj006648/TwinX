@@ -46,7 +46,7 @@ streaming:
     backend_csp_args:
       # wss (보안 웹소켓)를 비활성화합니다.
       enable_wss: false
-      # base_domain을 빈 값으로 설정합니다.
+      # base_domain을 빈 값으로 설정합니다잇
       base_domain: "10.38.38.203"
 
   image:
