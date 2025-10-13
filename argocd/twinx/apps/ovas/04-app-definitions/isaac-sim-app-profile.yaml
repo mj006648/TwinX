@@ -27,6 +27,17 @@ spec:
 
       service:
         type: "LoadBalancer"
+      env:
+        - name: ACCEPT_EULA
+          value: "Y"
+        - name: PRIVACY_CONSENT
+          value: "Y"
+        - name: OMNI_SERVER
+          value: "omniverse://10.38.38.32"
+        - name: OMNI_USER
+          value: "admin"
+        - name: OMNI_PASS
+          value: "0070"
       resources:
         limits:
           cpu: "12"
@@ -34,6 +45,5 @@ spec:
           nvidia.com/gpu: "1"
         requests:
           nvidia.com/gpu: "1"
-
       nodeSelector:
         NodeGroup: gpu
