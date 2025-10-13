@@ -173,7 +173,7 @@ data:
     def main():
         spark = get_spark_session()
         
-        kafka_df = spark.readStream.format("kafka").option("kafka.bootstrap.servers", KAFKA_BOOTSTRAP_SERVERS).option("subscribePattern", "iceberg-.*").option("startingOffsets", "earliest").load()
+        kafka_df = spark.readStream.format("kafka").option("kafka.bootstrap.servers", KAFKA_BOOTSTRAP_SERVERS).option("subscribePattern", "user.*").option("startingOffsets", "earliest").load()
         
         query = (
             kafka_df.writeStream

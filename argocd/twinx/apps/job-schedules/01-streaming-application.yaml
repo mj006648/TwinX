@@ -17,8 +17,8 @@ spec:
     type: Always # 스트리밍 잡은 항상 재시작되어야 함
   driver:
     serviceAccount: spark-sa
-    cores: 1
-    memory: "1g"
+    cores: 2
+    memory: "4g"
     envFrom:
       - secretRef:
           name: s3-creds-for-streaming-spark
@@ -27,8 +27,8 @@ spec:
         mountPath: /mnt/scripts
   executor:
     instances: 2
-    cores: 1
-    memory: "1g"
+    cores: 2
+    memory: "4g"
     envFrom:
       - secretRef:
           name: s3-creds-for-streaming-spark
