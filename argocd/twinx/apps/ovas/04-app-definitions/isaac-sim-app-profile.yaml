@@ -19,10 +19,14 @@ spec:
       imagePullSecrets:
         - name: regcred
     streamingKit:
+      image:
+        # isaac-sim-app-ver.yaml 파일에 정의된 컨테이너 정보를 명시합니다.
+        repository: nvcr.io/nvidia/isaac-sim
+        pullPolicy: Always
+        tag: '5.0.0'
+
       service:
         type: "LoadBalancer"
-
-      # --- Docker의 "-e" (환경 변수) 부분을 여기에 반영 ---
       env:
         - name: ACCEPT_EULA
           value: "Y"
@@ -32,24 +36,17 @@ spec:
           value: "omniverse://10.38.38.32"
         - name: OMNI_USER
           value: "admin"
-        - name: OMNI_PASS 
-          value: "0070" 
-          
-      # --- Docker의 "--gpus" (리소스) 부분을 여기에 반영 ---
+        - name: OMNI_PASS
+          value: "0070"
       resources:
         limits:
-          cpu: "12" 
-          memory: "48Gi" 
-          # docker run 명령어에서 3개의 GPU를 요청했으므로 "3"으로 설정
-          nvidia.com/gpu: "1" 
-        requests:
-          # 요청과 한도를 동일하게 맞추는 것이 안정적입니다.
+          cpu: "12"
+          memory: "48Gi"
           nvidia.com/gpu: "1"
-          
-      # --- Docker의 Entrypoint/CMD 부분을 여기에 반영 ---
-      # 스트리밍을 위한 헤드리스 실행(no-window)이 핵심입니다.
+        requests:
+          nvidia.com/gpu: "1"
       args:
-        - --no-window
+        - --no-window # <-- 이 옵션이 없었다면 추가하는 것이 좋습니다.
         - --exts.kit.app.streaming.enabled=true
         - --exts.kit.app.streaming.viewport.enabled=true
         - --exts.kit.app.streaming.gui.enabled=true
