@@ -1,7 +1,24 @@
 # FILE: argocd/twinx/apps/gpu-operator/values.yaml
-# NVIDIA GPU Operator의 핵심 설정을 정의합니다.
-USER-SUPPLIED VALUES: null
-
-# 이 설정을 통해 NodeGroup=gpu 레이블이 있는 노드(l40s)에만 Operator가 배포됩니다.
-nodeSelector:
-  NodeGroup: gpu
+# gpu-operator의 모든 구성요소가 'NodeGroup=gpu' 레이블이 있는 노드에만 배포되도록 설정합니다.
+driver:
+  nodeSelector:
+    NodeGroup: gpu
+toolkit:
+  nodeSelector:
+    NodeGroup: gpu
+devicePlugin:
+  nodeSelector:
+    NodeGroup: gpu
+dcgmExporter:
+  nodeSelector:
+    NodeGroup: gpu
+gfd: # GPU Feature Discovery
+  nodeSelector:
+    NodeGroup: gpu
+operator:
+  nodeSelector:
+    NodeGroup: gpu
+node-feature-discovery:
+  worker:
+    nodeSelector:
+      NodeGroup: gpu
