@@ -28,7 +28,7 @@ applications:
         path: "argocd/twinx/apps/metallb-resources"
    
     gpu-operator:
-      enabled: false
+      enabled: true
       namespace: gpu-operator # Operator와 관련 컴포넌트를 설치할 네임스페이스
       syncWave: "2"
       source:
@@ -388,7 +388,7 @@ applications:
       namespace: omni-streaming
       syncWave: "29"
       source:
-        path: "argocd/twinx/apps/ovas/02-auth/ngc-omni-user/omniverse-repo.yaml"
+        path: "argocd/twinx/apps/ovas/02-auth/ngc-omni-user"
 
     rmcp:
       enabled: true
