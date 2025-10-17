@@ -22,7 +22,7 @@ spec:
     streamingKit:
       image:
         # isaac-sim-app-ver.yaml 파일에 정의된 컨테이너 정보를 명시합니다.
-        repository: ich6648/custom-isaac-sim
+        repository: ich6648/ovas-isaac-sim
         pullPolicy: Always
         tag: '2.0.0'
 
