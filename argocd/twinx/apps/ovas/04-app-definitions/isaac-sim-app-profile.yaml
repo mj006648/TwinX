@@ -1,11 +1,13 @@
 # ./argocd/twinx/apps/ovas/04-app-definitions/isaac-sim-app-profile.yaml
+# 임시 테스트로 수정한 v2
 apiVersion: omniverse.nvidia.com/v1
 kind: ApplicationProfile
 metadata:
-  name: isaac-sim-omni-connect
+  # v2 버전 (테스트용)
+  name: isaac-sim-5-0-custom-v2
 spec:
-  name: Isaac Sim with Omni Connection
-  description: High-performance profile for Isaac Sim with pre-configured Omniverse connection.
+  name: Isaac Sim 5.0 (Custom Livestream V2)
+  description: "Custom-built profile with injected Livestream settings (publicIp, headless) for OVAS."
   supportedApplications:
     - name: "isaac-sim"
       versions:
@@ -20,23 +22,41 @@ spec:
         - name: regcred
     streamingKit:
       image:
-        # isaac-sim-app-ver.yaml 파일에 정의된 컨테이너 정보를 명시합니다.
-        repository: nvcr.io/nvidia/isaac-sim
+        # [수정 1] 나중에 다시 레지스토리 주소 수정
+        repository: "ttyy441/isaac-sim"
         pullPolicy: Always
-        tag: '5.0.0'
+        tag: "5.0" # 빌드 시 사용한 태그
 
       service:
-        type: "LoadBalancer" # 환경에 따라 ClusterIP 등으로 변경 가능
+        type: "LoadBalancer"
+
+      # [수정 2] entrypoint.sh와 연동될 환경 변수 대거 추가
       env:
         - name: ACCEPT_EULA
           value: "Y"
         - name: PRIVACY_CONSENT
           value: "Y"
+
+        # --- Nucleus 연결 정보 (Nucleus 주소도 변경되었다고 가정하고 이전 id, pw 전부 넣어둠---
+        - name: OMNI_SERVER
+          value: "omniverse://10.38.38.32"
+        - name: OMNI_USER
+          value: "admin"
+        - name: OMNI_PASS
+          value: "0070"
+
+        # --- root 실행 및 스트리밍 설정 ---
+        - name: OMNI_KIT_ALLOW_ROOT
+          value: "1"
+        - name: LIVESTREAM_PUBLIC_IP
+          value: "10.38.38.203" # 뷰어의 Stream Server IP
+        - name: LIVESTREAM_STREAM_TYPE
+          value: "webrtc"
+
+      # [수정 3] entrypoint.sh의 "$@"로 전달될 인자
       args:
-        - --/exts/omni.kit.livestream.app/primaryStream/allowDynamicResize=false
-        - --/exts/omni.kit.livestream.app/primaryStream/targetFps=60
-        - --/exts/omni.kit.livestream.app/primaryStream/signalPort=49100
-        - --/exts/omni.kit.livestream.app/primaryStream/streamPort=47998
+        - "--headless"
+        # 기존 Livestream 관련 인자들은 entrypoint.sh에서 주입하도록 수정
 
       resources:
         limits:
@@ -44,9 +64,9 @@ spec:
           memory: "48Gi"
           nvidia.com/gpu: "1"
         requests:
-          # limits와 동일하게 설정하여 Guaranteed QoS를 받는 것이 안정적입니다.
           cpu: "12"
           memory: "48Gi"
           nvidia.com/gpu: "1"
+
       nodeSelector:
         NodeGroup: gpu
