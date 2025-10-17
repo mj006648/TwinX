@@ -1,0 +1,52 @@
+# ./argocd/twinx/apps/ovas/04-app-definitions/isaac-sim-app-profile.yaml
+apiVersion: omniverse.nvidia.com/v1
+kind: ApplicationProfile
+metadata:
+  name: isaac-sim-omni-connect
+spec:
+  name: Isaac Sim with Omni Connection
+  description: High-performance profile for Isaac Sim with pre-configured Omniverse connection.
+  supportedApplications:
+    - name: "isaac-sim"
+      versions:
+        - "5.0.0"
+  chartMappings:
+    container: streamingKit.image.repository
+    container_version: streamingKit.image.tag
+    name: streamingKit.name
+  chartValues:
+    global:
+      imagePullSecrets:
+        - name: regcred
+    streamingKit:
+      image:
+        # isaac-sim-app-ver.yaml 파일에 정의된 컨테이너 정보를 명시합니다.
+        repository: nvcr.io/nvidia/isaac-sim
+        pullPolicy: Always
+        tag: '5.0.0'
+
+      service:
+        type: "LoadBalancer" # 환경에 따라 ClusterIP 등으로 변경 가능
+      env:
+        - name: ACCEPT_EULA
+          value: "Y"
+        - name: PRIVACY_CONSENT
+          value: "Y"
+      args:
+        - --/exts/omni.kit.livestream.app/primaryStream/allowDynamicResize=false
+        - --/exts/omni.kit.livestream.app/primaryStream/targetFps=60
+        - --/exts/omni.kit.livestream.app/primaryStream/signalPort=49100
+        - --/exts/omni.kit.livestream.app/primaryStream/streamPort=47998
+
+      resources:
+        limits:
+          cpu: "12"
+          memory: "48Gi"
+          nvidia.com/gpu: "1"
+        requests:
+          # limits와 동일하게 설정하여 Guaranteed QoS를 받는 것이 안정적입니다.
+          cpu: "12"
+          memory: "48Gi"
+          nvidia.com/gpu: "1"
+      nodeSelector:
+        NodeGroup: gpu
