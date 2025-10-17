@@ -26,16 +26,10 @@ spec:
         # 3단계에서 푸시한 내 이미지의 경로와 태그를 정확히 기입합니다.
         repository: ich6648/ovas-isaac-sim
         pullPolicy: Always
-        tag: '1.0.0'
+        tag: '2.0.0'
 
       service:
         type: "LoadBalancer"
-      env:
-        # 여기에 정의된 값들이 OVAS에 의해 자동으로 저수준 실행 인자로 변환되어 주입됩니다.
-        - name: ACCEPT_EULA
-          value: "Y"
-        - name: PRIVACY_CONSENT
-          value: "Y"
       resources:
         limits:
           cpu: "12"
