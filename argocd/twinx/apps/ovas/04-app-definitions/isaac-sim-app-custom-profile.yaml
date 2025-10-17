@@ -9,7 +9,7 @@ spec:
   supportedApplications:
     - name: "isaac-sim"
       versions:
-        - "custom-2.0.0"
+        - "*"
   chartMappings:
     container: streamingKit.image.repository
     container_version: streamingKit.image.tag

@@ -6,7 +6,7 @@ metadata:
   labels:
     app: isaac-sim
     applicationName: isaac-sim
-    version: 'custom-2.0.0' # 프로파일이 이 버전을 식별하는 데 사용할 키
+    version: '2.0.0' # 프로파일이 이 버전을 식별하는 데 사용할 키
 spec:
   helm_chart: ngc-omniverse/kit-appstreaming-session
   helm_chart_version: '1.10.1'
