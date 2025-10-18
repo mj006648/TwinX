@@ -2,7 +2,7 @@
 apiVersion: omniverse.nvidia.com/v1
 kind: ApplicationProfile
 metadata:
-  name: isaac-sim-5-0-custom-v4 # v4
+  name: isaac-sim-5-0-custom-v5 # v5
 spec:
   name: Isaac Sim 5.0 (Custom Livestream V4 )
   description: "Restored static streaming args to YAML 'args' section for entrypoint script."
@@ -25,6 +25,19 @@ spec:
         tag: "5.0"
       service:
         type: "LoadBalancer"
+        ports:
+          - name: http
+            port: 8080
+            targetPort: 8080
+            protocol: TCP
+          - name: signal
+            port: 49100
+            targetPort: 49100
+            protocol: TCP
+          - name: media
+            port: 1024
+            targetPort: 1024
+            protocol: UDP        
       env:
         # --- entrypoint.sh가 읽을 환경 변수들 --- (여기는 기존 4.5 버전 환경변수들 추가 예정)
         - name: ACCEPT_EULA
@@ -51,6 +64,7 @@ spec:
         - "--/exts/omni.kit.livestream.app/primaryStream/allowDynamicResize=false"
         - "--/exts/omni.kit.livestream.app/primaryStream/targetFps=60"
         - "--/exts/omni.kit.livestream.app/primaryStream/signalPort=49100"
+        - "--/exts/omni.kit.livestream.app/primaryStream/publicIp=0.0.0.0"
 
       resources:
         limits:
