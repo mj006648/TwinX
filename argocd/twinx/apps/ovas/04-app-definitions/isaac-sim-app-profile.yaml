@@ -48,8 +48,6 @@ spec:
         # --- root 실행 및 스트리밍 설정 ---
         - name: OMNI_KIT_ALLOW_ROOT
           value: "1"
-        - name: LIVESTREAM_PUBLIC_IP
-          value: "10.38.38.203" # 뷰어의 Stream Server IP
         - name: LIVESTREAM_STREAM_TYPE
           value: "webrtc"
 
