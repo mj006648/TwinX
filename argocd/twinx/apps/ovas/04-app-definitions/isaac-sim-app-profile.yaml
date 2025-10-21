@@ -1,11 +1,10 @@
-# ./argocd/twinx/apps/ovas/04-app-definitions/isaac-sim-app-profile-v3.yaml
 apiVersion: omniverse.nvidia.com/v1
 kind: ApplicationProfile
 metadata:
-  name: isaac-sim-5-0-custom-v6 # v6
+  name: isaac-sim-5-0-official-v1
 spec:
-  name: Isaac Sim 5.0 (Custom Livestream V4 )
-  description: "Restored static streaming args to YAML 'args' section for entrypoint script."
+  name: "Isaac Sim 5.0 (OVAS Official Config)"
+  description: "Final configuration for official Isaac Sim image with all settings in YAML."
   supportedApplications:
     - name: "isaac-sim"
       versions:
@@ -20,26 +19,18 @@ spec:
         - name: regcred
     streamingKit:
       image:
-        repository: "ttyy441/isaac-sim" # [수정] 나중에 여기 이미지 주소 수정
+        repository: "nvcr.io/nvidia/isaac-sim"
         pullPolicy: Always
-        tag: "5.0"
-      service:
-        type: "LoadBalancer"
-        ports:
-          - name: http
-            port: 8080
-            targetPort: 8080
-            protocol: TCP
-          - name: signal
-            port: 49100
-            targetPort: 49100
-            protocol: TCP
-          - name: media
-            port: 47998
-            targetPort: 47998
-            protocol: UDP        
+        tag: "5.0.0"
+
+      iceServers:
+        - urls:
+            - "stun:stun.l.google.com:19302"
+            - "turn:10.38.38.210:3478?transport=udp"
+          credential: "test"
+          username: "test"
+
       env:
-        # --- entrypoint.sh가 읽을 환경 변수들 --- (여기는 기존 4.5 버전 환경변수들 추가 예정)
         - name: ACCEPT_EULA
           value: "Y"
         - name: PRIVACY_CONSENT
@@ -52,27 +43,10 @@ spec:
           value: "0070"
         - name: OMNI_KIT_ALLOW_ROOT
           value: "1"
-        - name: LIVESTREAM_STREAM_TYPE
-          value: "webrtc"
 
-        # --- [추가] entrypoint.sh가 읽을 스트리밍/STUN/TURN 변수 ---
-        - name: LIVESTREAM_STREAM_TYPE
-          value: "webrtc"
-        - name: LIVESTREAM_PUBLIC_IP
-          value: "10.38.38.203" # [중요] 실제 접속할 K8S LoadBalancer의 외부 IP 또는 노드 IP
-        - name: STUN_SERVER
-          value: "stun:stun.l.google.com:19302"
-        - name: TURN_SERVER
-          value: "turn:10.38.38.210:3478"
-        - name: TURN_USERNAME
-          value: "test"
-        - name: TURN_PASSWORD
-          value: "test"
-
-      # --- [수정] entrypoint.sh의 "$@"로 전달될 인자들 ---
-      # https://github.com/NVIDIA-Omniverse/web-viewer-sample
       args:
         - "--headless"
+        - "--/exts/omni.kit.livestream.app/primaryStream/streamType=webrtc"
         - "--/exts/omni.kit.livestream.app/primaryStream/allowDynamicResize=false"
         - "--/exts/omni.kit.livestream.app/primaryStream/targetFps=60"
         - "--/exts/omni.kit.livestream.app/primaryStream/signalPort=49100"
@@ -89,3 +63,4 @@ spec:
           nvidia.com/gpu: "1"
       nodeSelector:
         NodeGroup: gpu
+
