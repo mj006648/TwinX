@@ -55,7 +55,16 @@ streaming:
       enable_wss: false
       # base_domain을 빈 값으로 설정합니다.
       base_domain: ""
-
+  # 임시로 테스트용   - 인용 
+  rbac:
+    create: true
+    rules:
+      - apiGroups: [""]
+        resources: ["pods", "services", "endpoints"]
+        verbs: ["get", "list", "watch"]
+      - apiGroups: ["discovery.k8s.io"]
+        resources: ["endpointslices"]
+        verbs: ["get", "list", "watch"]
   image:
     repository: "nvcr.io/nvidia/omniverse/kit-appstreaming-manager"
     pullPolicy: Always
