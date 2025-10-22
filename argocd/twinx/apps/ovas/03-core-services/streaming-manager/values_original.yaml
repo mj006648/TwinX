@@ -31,13 +31,6 @@ streaming:
     pathType: Prefix
     enabled: true
 
-  iceServers:
-    - urls:
-        - "stun:stun.l.google.com:19302"
-        - "turn:10.38.38.210:3478?transport=udp"
-      credential: "test"
-      username: "test"
-
   serviceConfig:
     root_path: ""
     prefix_url: "/streaming"
