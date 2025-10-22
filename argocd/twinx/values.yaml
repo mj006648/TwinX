@@ -405,7 +405,7 @@ applications:
             - "argocd/twinx/apps/ovas/03-core-services/rmcp/values.yaml"
 
     streaming:
-      enabled: true
+      enabled: false
       namespace: omni-streaming
       syncWave: "31"
       source:
