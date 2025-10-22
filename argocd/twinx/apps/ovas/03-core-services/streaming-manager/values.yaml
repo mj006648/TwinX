@@ -61,7 +61,7 @@ streaming:
     rules:
       - apiGroups: [""]
         resources: ["pods", "services", "endpoints"]
-        verbs: ["get", "list", "watch"]
+        verbs: ["get", "list", "watch", "create", "delete", "patch"]
       - apiGroups: ["discovery.k8s.io"]
         resources: ["endpointslices"]
         verbs: ["get", "list", "watch"]
