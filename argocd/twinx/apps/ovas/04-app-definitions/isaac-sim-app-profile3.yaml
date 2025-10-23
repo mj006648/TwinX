@@ -1,0 +1,69 @@
+apiVersion: omniverse.nvidia.com/v1
+kind: ApplicationProfile
+metadata:
+  name: isaac-sim-5-0-official-v4
+spec:
+  name: "Isaac Sim 5.0 (OVAS Official Config)"
+  description: "Final configuration for official Isaac Sim image with all settings in YAML."
+  supportedApplications:
+    - name: "isaac-sim"
+      versions:
+        - "5.0.0"
+  chartMappings:
+    container: streamingKit.image.repository
+    container_version: streamingKit.image.tag
+    name: streamingKit.name
+  chartValues:
+    global:
+      imagePullSecrets:
+        - name: regcred
+    streamingKit:
+      image:
+        repository: "nvcr.io/nvidia/isaac-sim"
+        pullPolicy: Always
+        tag: "5.0.0"
+
+      service:
+        type: "LoadBalancer"
+
+      iceServers:
+        - urls:
+            - "stun:stun.l.google.com:19302"
+            - "turn:10.38.38.210:3478?transport=udp"
+          credential: "test"
+          username: "test"
+
+      env:
+        - name: ACCEPT_EULA
+          value: "Y"
+        - name: PRIVACY_CONSENT
+          value: "Y"
+        - name: OMNI_SERVER
+          value: "omniverse://10.38.38.32"
+        - name: OMNI_USER
+          value: "admin"
+        - name: OMNI_PASS
+          value: "0070"
+        - name: OMNI_KIT_ALLOW_ROOT
+          value: "1"
+
+      args:
+        - "--headless"
+        - "--/exts/omni.kit.livestream.app/primaryStream/streamType=webrtc"
+        - "--/exts/omni.kit.livestream.app/primaryStream/allowDynamicResize=false"
+        - "--/exts/omni.kit.livestream.app/primaryStream/targetFps=60"
+        - "--/exts/omni.kit.livestream.app/primaryStream/signalPort=49100"
+        - "--/exts/omni.kit.livestream.app/primaryStream/streamPort=1024"
+
+      resources:
+        limits:
+          cpu: "12"
+          memory: "48Gi"
+          nvidia.com/gpu: "1"
+        requests:
+          cpu: "12"
+          memory: "48Gi"
+          nvidia.com/gpu: "1"
+      nodeSelector:
+        NodeGroup: gpu
+
