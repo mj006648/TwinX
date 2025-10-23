@@ -31,13 +31,6 @@ streaming:
     pathType: Prefix
     enabled: true
 
-  iceServers:
-    - urls:
-        - "stun:stun.l.google.com:19302"
-        - "turn:10.38.38.210:3478?transport=udp"
-      credential: "test"
-      username: "test"
-
   serviceConfig:
     root_path: ""
     prefix_url: "/streaming"
@@ -55,16 +48,7 @@ streaming:
       enable_wss: false
       # base_domain을 빈 값으로 설정합니다.
       base_domain: ""
-  # 임시로 테스트용   - 인용 
-  rbac:
-    create: true
-    rules:
-      - apiGroups: [""]
-        resources: ["pods", "services", "endpoints"]
-        verbs: ["get", "list", "watch", "create", "delete", "patch"]
-      - apiGroups: ["discovery.k8s.io"]
-        resources: ["endpointslices"]
-        verbs: ["get", "list", "watch"]
+
   image:
     repository: "nvcr.io/nvidia/omniverse/kit-appstreaming-manager"
     pullPolicy: Always
