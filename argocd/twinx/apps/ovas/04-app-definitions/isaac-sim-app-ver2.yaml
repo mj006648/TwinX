@@ -1,7 +1,7 @@
 apiVersion: omniverse.nvidia.com/v1
 kind: ApplicationVersion
 metadata:
-  name: isaacsim-3.0.0
+  name: isaacsim-4.0.0
   labels:
     app: isaacsim
     applicationName: isaacsim
