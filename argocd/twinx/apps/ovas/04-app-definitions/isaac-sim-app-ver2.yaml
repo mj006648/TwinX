@@ -9,5 +9,5 @@ metadata:
 spec:
   helm_chart: ngc-omniverse/kit-appstreaming-session
   helm_chart_version: '1.10.1'
-  container: docker.io/ch6648/ovas-isaac-sim
+  container: docker.io/ich6648/ovas-isaac-sim
   container_version: '9.0.0'

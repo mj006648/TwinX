@@ -20,7 +20,7 @@ spec:
         - name: regcred
     streamingKit:
       image:
-        repository: docker.io/ch6648/ovas-isaac-sim
+        repository: docker.io/ich6648/ovas-isaac-sim
         pullPolicy: Always
         tag: '9.0.0'
 
