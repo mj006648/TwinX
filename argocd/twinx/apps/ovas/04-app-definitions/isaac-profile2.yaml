@@ -10,8 +10,8 @@ spec:
       versions: 
         - "*"
   chartMappings:
-    container: ich6648/ovas-isaac-sim
-    container_version: '9.0.0'
+    container: streamingKit.image.repository
+    container_version: streamingKit.image.tag
     name: streamingKit.name
   chartValues:
     global:
