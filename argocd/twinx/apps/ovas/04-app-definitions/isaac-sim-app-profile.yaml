@@ -1,7 +1,7 @@
 apiVersion: omniverse.nvidia.com/v1
 kind: ApplicationProfile
 metadata:
-  name: isaac-sim-5-0-custom-ich6648-v2
+  name: isaac-sim-5-0-custom-ich6648-v3
 spec:
   name: "Isaac Sim 5.0 (Custom ich6648)"
   description: "Final configuration for official Isaac Sim image with all settings in YAML."
@@ -30,7 +30,13 @@ spec:
             - "turn:10.38.38.210:3478?transport=udp"
           credential: "test"
           username: "test"
-
+      startupProbe:
+          httpGet:
+            path: /v1/streaming/ready  
+            port: 8011                
+          initialDelaySeconds: 60
+          periodSeconds: 10
+          failureThreshold: 30
       env:
         - name: ACCEPT_EULA
           value: "Y"
@@ -43,7 +49,23 @@ spec:
         - name: OMNI_PASS
           value: "0070"
         - name: OMNI_KIT_ALLOW_ROOT
-          value: "1"
+              value: "1"
+              
+      readinessProbe:
+        httpGet:
+          path: /v1/streaming/ready
+          port: 8011
+        initialDelaySeconds: 10
+        periodSeconds: 5
+        failureThreshold: 12
+
+      startupProbe:
+        httpGet:
+          path: /v1/streaming/ready
+          port: 8011
+        initialDelaySeconds: 30
+        periodSeconds: 10
+        failureThreshold: 30
 
       args:
         - "--headless"
