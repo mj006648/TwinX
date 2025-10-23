@@ -1,0 +1,33 @@
+apiVersion: omniverse.nvidia.com/v1
+kind: ApplicationProfile
+metadata:
+  name: default
+spec:
+  name: Default profile
+  description: Updated memory and CPU settings.
+  supportedApplications:
+    - name: "isaac"
+      versions: 
+        - "*"
+  chartMappings:
+    container: ich6648/ovas-isaac-sim
+    container_version: '9.0.0'
+    name: streamingKit.name
+  chartValues:
+    global:
+      imagePullSecrets:
+        - name: regcred
+    streamingKit:
+      image:
+        repository: ich6648/ovas-isaac-sim
+        pullPolicy: Always
+        tag: '9.0.0'
+      sessionId: session_id
+      name: kit-test
+      resources:
+        requests:
+          nvidia.com/gpu: "1"
+        limits:
+          cpu: "12"
+          memory: "48Gi"
+          nvidia.com/gpu: "1"
