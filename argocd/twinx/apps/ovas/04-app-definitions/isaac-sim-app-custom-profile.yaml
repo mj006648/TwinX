@@ -26,8 +26,8 @@ spec:
         pullPolicy: Always
         tag: '9.0.0'
 
-      service:
-        type: "LoadBalancer" # 환경에 따라 ClusterIP 등으로 변경 가능
+          #    service:
+          # type: "LoadBalancer" # 환경에 따라 ClusterIP 등으로 변경 가능
       env:
         - name: ACCEPT_EULA
           value: "Y"
