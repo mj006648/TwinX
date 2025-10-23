@@ -10,47 +10,29 @@ spec:
       versions:
         - "5.0.0"
   chartMappings:
-    #container: docker.io/ich6648/ovas-isaac-sim
-    #container_version: '3.0.0' 
+
     container: streamingKit.image.repository
     container_version: streamingKit.image.tag
     name: streamingKit.name
+
   chartValues:
     global:
       imagePullSecrets:
         - name: regcred
+
     streamingKit:
       image:
         repository: "docker.io/ich6648/ovas-isaac-sim"
         pullPolicy: Always
-        tag: "3.0.0"      
+        tag: "3.0.0"
+
       iceServers:
         - urls:
             - "stun:stun.l.google.com:19302"
             - "turn:10.38.38.210:3478?transport=udp"
           credential: "test"
           username: "test"
-      startupProbe:
-          httpGet:
-            path: /v1/streaming/ready  
-            port: 8011                
-          initialDelaySeconds: 60
-          periodSeconds: 10
-          failureThreshold: 30
-      env:
-        - name: ACCEPT_EULA
-          value: "Y"
-        - name: PRIVACY_CONSENT
-          value: "Y"
-        - name: OMNI_SERVER
-          value: "omniverse://10.38.38.32"
-        - name: OMNI_USER
-          value: "admin"
-        - name: OMNI_PASS
-          value: "0070"
-        - name: OMNI_KIT_ALLOW_ROOT
-              value: "1"
-              
+
       readinessProbe:
         httpGet:
           path: /v1/streaming/ready
@@ -63,9 +45,23 @@ spec:
         httpGet:
           path: /v1/streaming/ready
           port: 8011
-        initialDelaySeconds: 30
+        initialDelaySeconds: 60
         periodSeconds: 10
         failureThreshold: 30
+
+      env:
+        - name: ACCEPT_EULA
+          value: "Y"
+        - name: PRIVACY_CONSENT
+          value: "Y"
+        - name: OMNI_SERVER
+          value: "omniverse://10.38.38.32"
+        - name: OMNI_USER
+          value: "admin"
+        - name: OMNI_PASS
+          value: "0070"
+        - name: OMNI_KIT_ALLOW_ROOT
+          value: "1"
 
       args:
         - "--headless"
@@ -84,6 +80,6 @@ spec:
           cpu: "12"
           memory: "48Gi"
           nvidia.com/gpu: "1"
+
       nodeSelector:
         NodeGroup: gpu
-
