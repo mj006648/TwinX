@@ -23,8 +23,6 @@ spec:
         repository: docker.io/ich6648/ovas-isaac-sim
         pullPolicy: Always
         tag: '9.0.0'
-      service:
-        type: "LoadBalancer"
       args:
         - "--headless"
         - "--/exts/omni.kit.livestream.app/primaryStream/streamType=webrtc"
