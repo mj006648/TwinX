@@ -23,19 +23,6 @@ spec:
         repository: ich6648/ovas-isaac-sim
         pullPolicy: Always
         tag: '9.0.0'
-      env:
-        - name: ACCEPT_EULA
-          value: "Y"
-        - name: PRIVACY_CONSENT
-          value: "Y"
-        - name: OMNI_SERVER
-          value: "omniverse://10.38.38.32"
-        - name: OMNI_USER
-          value: "admin"
-        - name: OMNI_PASS
-          value: "0070"
-        - name: OMNI_KIT_ALLOW_ROOT
-          value: "1"
 
       args:
         - "--headless"
