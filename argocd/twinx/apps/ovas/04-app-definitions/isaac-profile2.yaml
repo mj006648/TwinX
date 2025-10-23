@@ -23,13 +23,6 @@ spec:
         repository: docker.io/ich6648/ovas-isaac-sim
         pullPolicy: Always
         tag: '3.0.0'
-      args:
-        - "--headless"
-        - "--/exts/omni.kit.livestream.app/primaryStream/streamType=webrtc"
-        - "--/exts/omni.kit.livestream.app/primaryStream/allowDynamicResize=false"
-        - "--/exts/omni.kit.livestream.app/primaryStream/targetFps=60"
-        - "--/exts/omni.kit.livestream.app/primaryStream/signalPort=49100"
-        - "--/exts/omni.kit.livestream.app/primaryStream/streamPort=1024"
 
       sessionId: session_id
       name: kit-test
