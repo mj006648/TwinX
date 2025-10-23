@@ -16,6 +16,7 @@ spec:
   chartValues:
     global:
       imagePullSecrets:
+        - name: changcred
         - name: regcred
     streamingKit:
       image:
