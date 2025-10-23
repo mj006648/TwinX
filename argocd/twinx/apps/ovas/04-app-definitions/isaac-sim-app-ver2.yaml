@@ -5,7 +5,7 @@ metadata:
   labels:
     app: isaacsim
     applicationName: isaacsim
-    version: 'v1'
+    version: '9.0.0'
 spec:
   helm_chart: ngc-omniverse/kit-appstreaming-session
   helm_chart_version: '1.10.1'
