@@ -10,5 +10,5 @@ metadata:
 spec:
   helm_chart: ngc-omniverse/kit-appstreaming-session
   helm_chart_version: '1.10.1' # 현재 사용 중인 OVAS Helm Chart 버전
-    #container: nvcr.io/nvidia/isaac-sim # NGC 이미지 경로
-    # container_version: '5.0.0'
+  container: nvcr.io/nvidia/isaac-sim # NGC 이미지 경로
+  container_version: '5.0.0'
