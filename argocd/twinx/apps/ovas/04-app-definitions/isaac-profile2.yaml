@@ -6,7 +6,7 @@ spec:
   name: Default profile
   description: Updated memory and CPU settings.
   supportedApplications:
-    - name: "isaac-sim"
+    - name: "isaac"
       versions: 
         - "*"
   chartMappings:
