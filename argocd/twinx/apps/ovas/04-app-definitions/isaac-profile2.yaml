@@ -8,7 +8,7 @@ spec:
   supportedApplications:
     - name: "isaacsim"
       versions: 
-        - "3.0.0"
+        - "4.0.0"
   chartMappings:
     container: streamingKit.image.repository
     container_version: streamingKit.image.tag
@@ -22,9 +22,7 @@ spec:
       image:
         repository: docker.io/ich6648/ovas-isaac-sim
         pullPolicy: Always
-        tag: '3.0.0'
-      service:
-        type: "LoadBalancer"
+        tag: '4.0.0'
       sessionId: session_id
       name: kit-test
       resources:
