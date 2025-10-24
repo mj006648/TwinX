@@ -5,6 +5,8 @@ metadata:
 spec:
   name: "Isaac Sim 5.0 (Custom ich6648)"
   description: "Final configuration for official Isaac Sim image with all settings in YAML."
+  container: "docker.io/ich6648/ovas-isaac-sim"
+  container_version: "3.0.0"  
   supportedApplications:
     - name: "isaac-sim"
       versions:
@@ -21,10 +23,12 @@ spec:
         - name: regcred
 
     streamingKit:
+      #image:
+      #  repository: "docker.io/ich6648/ovas-isaac-sim"
+      #  pullPolicy: Always
+      #  tag: "3.0.0"
       image:
-        repository: "docker.io/ich6648/ovas-isaac-sim"
         pullPolicy: Always
-        tag: "3.0.0"
 
       iceServers:
         - urls:
