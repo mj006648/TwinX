@@ -69,7 +69,7 @@ spec:
         - "--/exts/omni.kit.livestream.app/primaryStream/allowDynamicResize=false"
         - "--/exts/omni.kit.livestream.app/primaryStream/targetFps=60"
         - "--/exts/omni.kit.livestream.app/primaryStream/signalPort=49100"
-        - "--/exts/omni.kit.livestream.app/primaryStream/streamPort=1024"
+        - "--/exts/omni.kit.livestream.app/primaryStream/streamPort=47998"
 
       resources:
         limits:
