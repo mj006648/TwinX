@@ -2,9 +2,9 @@
 apiVersion: omniverse.nvidia.com/v1
 kind: ApplicationProfile
 metadata:
-  name: isaacsim-custom-profile4-3-13-0
+  name: isaacsim-custom-profile4-3-14
 spec:
-  name: Isaacsim Custom Profile4-3-13-0
+  name: Isaacsim Custom Profile4-3-14
   description: Updated memory and CPU settings for Isaacsim.
   supportedApplications:
     - name: "isaacsim"
