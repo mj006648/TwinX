@@ -39,4 +39,4 @@ spec:
         - name: RMW_IMPLEMENTATION
           value: "rmw_fastrtps_cpp"
         - name: LD_LIBRARY_PATH
-          value: "/home/ubuntu/.local/share/ov/data/Kit/isaacsim.exp.template.full/0.1/exts/3/isaacsim.ros2.bridge-4.12.4+107.3.3.lx64/humble/lib"
+          value: "/home/ubuntu/.local/share/ov/data/Kit/isaacsim.exp.template.full/0.1/exts/3/isaacsim.ros2.bridge-4.12.4+107.3.3.lx64/humble/lib/"
