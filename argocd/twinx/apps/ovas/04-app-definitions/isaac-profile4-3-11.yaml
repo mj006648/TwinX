@@ -24,6 +24,8 @@ spec:
         repository: docker.io/ich6648/ovas-isaac-sim
         pullPolicy: Always
         tag: '4.3.11'
+      service:
+        type: "LoadBalancer"        
       sessionId: session_id
       name: kit-test
       resources:
