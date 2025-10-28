@@ -8,7 +8,7 @@ spec:
   supportedApplications:
     - name: "isaacsim"
       versions: 
-        - "5.0.0"
+        - "*"
   chartMappings:
     container: streamingKit.image.repository
     container_version: streamingKit.image.tag
@@ -23,20 +23,12 @@ spec:
         repository: docker.io/ich6648/ovas-isaac-sim
         pullPolicy: Always
         tag: '5.0.0'
-
-      # 1. 각 세션마다 고유한 외부 IP를 할당받기 위해 LoadBalancer 타입을 지정합니다.
+      sessionId: session_id
+      name: kit-app
       service:
         type: "LoadBalancer"
 
-      # 2. 컨테이너의 기본 실행 명령을 무시하고, 스트리밍 전용 스크립트를 직접 실행하도록 강제합니다.
-      #    이것이 이 문제의 가장 확실하고 근본적인 해결책입니다.
-      command: ["/bin/bash", "-c"]
-      args:
-        - "./isaacsim.exp.full.streaming.kit.sh --no-window"
-
       resources:
-        requests:
-          nvidia.com/gpu: "1"
         limits:
           cpu: "12"
           memory: "48Gi"
