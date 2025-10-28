@@ -1,0 +1,37 @@
+# isaacsim-custom-profile4-3-11.yaml
+apiVersion: omniverse.nvidia.com/v1
+kind: ApplicationProfile
+metadata:
+  name: isaacsim-custom-profile4-3-12
+spec:
+  name: Isaacsim Custom Profile4-3-12
+  description: Updated memory and CPU settings for Isaacsim.
+  supportedApplications:
+    - name: "isaacsim"
+      versions:
+        - "4.3.12"
+  chartMappings:
+    container: streamingKit.image.repository
+    container_version: streamingKit.image.tag
+    name: streamingKit.name
+  chartValues:
+    global:
+      imagePullSecrets:
+        - name: changcred
+        - name: regcred
+    streamingKit:
+      image:
+        repository: docker.io/ich6648/ovas-isaac-sim
+        pullPolicy: Always
+        tag: '4.3.12'
+      service:
+        type: "LoadBalancer"        
+      sessionId: session_id
+      name: kit-test
+      resources:
+        requests:
+          nvidia.com/gpu: "1"
+        limits:
+          cpu: "12"
+          memory: "48Gi"
+          nvidia.com/gpu: "1"
