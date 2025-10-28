@@ -23,6 +23,8 @@ spec:
         repository: docker.io/ich6648/ovas-isaac-sim
         pullPolicy: Always
         tag: '5.0.0'
+      sessionId: session_id
+      name: kit-test
       service:
         type: "LoadBalancer"
       resources:
@@ -32,11 +34,3 @@ spec:
           cpu: "12"
           memory: "48Gi"
           nvidia.com/gpu: "1"
-      # <<<--- 이 아랫부분을 추가해야 합니다 ---
-      env:
-        - name: ROS_DISTRO
-          value: "humble"
-        - name: RMW_IMPLEMENTATION
-          value: "rmw_fastrtps_cpp"
-        - name: LD_LIBRARY_PATH
-          value: "/home/ubuntu/.local/share/ov/data/Kit/isaacsim.exp.template.full/0.1/exts/3/isaacsim.ros2.bridge-4.12.4+107.3.3.lx64/humble/lib/"
