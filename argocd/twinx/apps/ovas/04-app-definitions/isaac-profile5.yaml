@@ -4,7 +4,7 @@ metadata:
   name: isaacsim-custom-profile5-0-0
 spec:
   name: Isaacsim Custom Profile5-0-0
-  description: Updated memory and CPU settings for Isaacsim with livestreaming enabled.
+  description: Forcing execution of the dedicated streaming script for Isaac Sim 5.0.0.
   supportedApplications:
     - name: "isaacsim"
       versions: 
@@ -23,14 +23,16 @@ spec:
         repository: docker.io/ich6648/ovas-isaac-sim
         pullPolicy: Always
         tag: '5.0.0'
+
+      # 1. 각 세션마다 고유한 외부 IP를 할당받기 위해 LoadBalancer 타입을 지정합니다.
       service:
         type: "LoadBalancer"
 
+      # 2. 컨테이너의 기본 실행 명령을 무시하고, 스트리밍 전용 스크립트를 직접 실행하도록 강제합니다.
+      #    이것이 이 문제의 가장 확실하고 근본적인 해결책입니다.
+      command: ["/bin/bash", "-c"]
       args:
-        - "--no-window"
-        - "--/exts/omni.kit.livestream.app/primaryStream/streamType=\"webrtc\""
-        - "--/exts/omni.kit.livestream.app/primaryStream/signalPort=49100"
-        - "--/exts/omni.kit.livestream.app/primaryStream/streamPort=47998"
+        - "./isaacsim.exp.full.streaming.kit.sh --no-window"
 
       resources:
         requests:
