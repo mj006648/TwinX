@@ -1,9 +1,9 @@
 apiVersion: omniverse.nvidia.com/v1
 kind: ApplicationProfile
 metadata:
-  name: isaacsim-custom-profile5-0-0  # "default"에서 고유한 이름으로 변경
+  name: isaacsim-custom-profile5-0-0
 spec:
-  name: Isaacsim Custom Profile5-0-0 # spec.name도 명확하게 바꿔주는 것이 좋습니다.
+  name: Isaacsim Custom Profile5-0-0
   description: Updated memory and CPU settings for Isaacsim.
   supportedApplications:
     - name: "isaacsim"
@@ -32,3 +32,11 @@ spec:
           cpu: "12"
           memory: "48Gi"
           nvidia.com/gpu: "1"
+      # <<<--- 이 아랫부분을 추가해야 합니다 ---
+      env:
+        - name: ROS_DISTRO
+          value: "humble"
+        - name: RMW_IMPLEMENTATION
+          value: "rmw_fastrtps_cpp"
+        - name: LD_LIBRARY_PATH
+          value: "/home/ubuntu/.local/share/ov/data/Kit/isaacsim.exp.template.full/0.1/exts/3/isaacsim.ros2.bridge-4.12.4+107.3.3.lx64/humble/lib"
