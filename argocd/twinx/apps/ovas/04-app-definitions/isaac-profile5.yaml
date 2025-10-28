@@ -24,7 +24,6 @@ spec:
         pullPolicy: Always
         tag: '5.0.0'
       sessionId: session_id
-      name: kit-test-session_id
       resources:
         requests:
           nvidia.com/gpu: "1"
