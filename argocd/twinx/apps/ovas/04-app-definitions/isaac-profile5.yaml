@@ -23,6 +23,8 @@ spec:
         repository: docker.io/ich6648/ovas-isaac-sim
         pullPolicy: Always
         tag: '5.0.0'
+      service:
+        type: "LoadBalancer"
       resources:
         requests:
           nvidia.com/gpu: "1"
