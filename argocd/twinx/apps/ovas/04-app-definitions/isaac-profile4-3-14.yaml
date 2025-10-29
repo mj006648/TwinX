@@ -14,7 +14,6 @@ spec:
     container: streamingKit.image.repository
     container_version: streamingKit.image.tag
     name: streamingKit.name
-    streamingKit: streamingKit
   chartValues:
     global:
       imagePullSecrets:
