@@ -27,7 +27,6 @@ spec:
         tag: '5.0.0'
       service:
         type: "LoadBalancer"  
-        loadBalancerIP: "10.38.38.240"      
       sessionId: session_id
       name: issac0
       resources:
