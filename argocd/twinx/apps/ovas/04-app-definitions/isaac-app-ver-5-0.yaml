@@ -6,9 +6,9 @@ metadata:
   labels:
     app: isaac
     applicationName: isaac
-    version: '5.0.0'
+    version: '4.3.13'
 spec:
   helm_chart: ngc-omniverse/kit-appstreaming-session
   helm_chart_version: '1.10.1'
   container: docker.io/ich6648/ovas-isaac-sim
-  container_version: '5.0.0'
+  container_version: '4.3.13'
