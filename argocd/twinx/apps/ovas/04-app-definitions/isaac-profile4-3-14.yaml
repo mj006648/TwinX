@@ -2,9 +2,9 @@
 apiVersion: omniverse.nvidia.com/v1
 kind: ApplicationProfile
 metadata:
-  name: isaacsim-custom-profile4-3-14
+  name: isaacsim-custom-profile4-3-13
 spec:
-  name: Isaacsim Custom Profile4-3-14
+  name: Isaacsim Custom Profile4-3-13
   description: Updated memory and CPU settings for Isaacsim.
   supportedApplications:
     - name: "isaacsim"
@@ -28,7 +28,7 @@ spec:
       service:
         type: "LoadBalancer"  
       sessionId: session_id
-      name: issac
+      name: kit-test
       resources:
         requests:
           nvidia.com/gpu: "1"
