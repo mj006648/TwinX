@@ -1,5 +1,4 @@
-# /argocd/twinx/apps/metallb-resources
-
+# 1. 기본 IP 주소 풀 (기존 풀의 범위를 줄여서 충돌 방지)
 apiVersion: metallb.io/v1beta1
 kind: IPAddressPool
 metadata:
@@ -7,8 +6,21 @@ metadata:
   namespace: metallb-system
 spec:
   addresses:
-  - 10.38.38.200-10.38.38.255
+  # Isaac Sim이 사용할 대역을 제외한 나머지
+  - 10.38.38.200-10.38.38.239 
 ---
+# 2. Isaac Sim 전용 IP 주소 풀
+apiVersion: metallb.io/v1beta1
+kind: IPAddressPool
+metadata:
+  name: isaac-sim-pool # 새로운 풀의 이름
+  namespace: metallb-system
+spec:
+  addresses:
+  # Isaac Sim 서비스에만 할당할 IP 대역
+  - 10.38.38.240-10.38.38.250
+---
+# 3. L2 광고 설정
 apiVersion: metallb.io/v1beta1
 kind: L2Advertisement
 metadata:
@@ -17,3 +29,4 @@ metadata:
 spec:
   ipAddressPools:
   - primary-pool
+  - isaac-sim-pool
