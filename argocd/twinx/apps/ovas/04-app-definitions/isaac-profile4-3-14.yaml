@@ -28,7 +28,7 @@ spec:
       service:
         type: "LoadBalancer" 
       sessionId: session_id
-      name: issac0
+      name: issactest
       resources:
         requests:
           nvidia.com/gpu: "1"
