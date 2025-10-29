@@ -7,7 +7,7 @@ spec:
   name: Isaacsim Custom Profile5-0-1
   description: Updated memory and CPU settings for Isaacsim.
   supportedApplications:
-    - name: "isaacsim1"
+    - name: "isaacsim"
       versions:
         - "5.0.1"
   chartMappings:
