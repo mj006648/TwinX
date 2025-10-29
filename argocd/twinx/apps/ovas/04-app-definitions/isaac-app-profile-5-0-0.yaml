@@ -1,4 +1,4 @@
-# ./argocd/twinx/apps/ovas/04-app-definitions/isaac-app-profile-5-0.yaml
+# ./argocd/twinx/apps/ovas/04-app-definitions/isaac-app-profile-5-0-0.yaml
 apiVersion: omniverse.nvidia.com/v1
 kind: ApplicationProfile
 metadata:
@@ -26,7 +26,9 @@ spec:
         pullPolicy: Always
         tag: '5.0.0'
       service:
-        type: "LoadBalancer"  
+        type: "LoadBalancer" 
+        annotations:
+          metallb.universe.tf/address-pool: isaac-sim0-pool
       sessionId: session_id
       name: isaac0
       resources:

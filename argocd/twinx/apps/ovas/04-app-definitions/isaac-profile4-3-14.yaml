@@ -28,7 +28,7 @@ spec:
       service:
         type: "LoadBalancer"
         annotations:
-            metallb.universe.tf/address-pool: isaac-sim2-pool
+            metallb.universe.tf/address-pool: praimary-pool
       sessionId: session_id
       name: issactest
       resources:

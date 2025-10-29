@@ -26,7 +26,9 @@ spec:
         pullPolicy: Always
         tag: '5.0.3'
       service:
-        type: "LoadBalancer"  
+        type: "LoadBalancer" 
+        annotations:
+          metallb.universe.tf/address-pool: isaac-sim3-pool
       sessionId: session_id
       name: isaac3
       resources:
