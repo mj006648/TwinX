@@ -390,10 +390,17 @@ applications:
       source:
         path: "argocd/twinx/apps/ovas/02-auth/ngc-omni-user"
 
-    rmcp:
+    ovas-nucleus-auth-secret:
       enabled: true
       namespace: omni-streaming
       syncWave: "30"
+      source:
+        path: "argocd/twinx/apps/ovas/02-auth/secrets"
+
+    rmcp:
+      enabled: true
+      namespace: omni-streaming
+      syncWave: "31"
       source:
         type: helm
         repoURL: https://helm.ngc.nvidia.com/nvidia/omniverse
@@ -407,7 +414,7 @@ applications:
     streaming:
       enabled: true
       namespace: omni-streaming
-      syncWave: "31"
+      syncWave: "32"
       source:
         type: helm
         repoURL: https://helm.ngc.nvidia.com/nvidia/omniverse
@@ -421,7 +428,7 @@ applications:
     applications:
       enabled: true
       namespace: omni-streaming
-      syncWave: "32"
+      syncWave: "33"
       source:
         type: helm
         repoURL: https://helm.ngc.nvidia.com/nvidia/omniverse
@@ -435,13 +442,13 @@ applications:
     ovas-app-definitions:
       enabled: true
       namespace: omni-streaming
-      syncWave: "33"
+      syncWave: "34"
       source:
         path: "argocd/twinx/apps/ovas/04-app-definitions"
 
     ovas-web-viewer:
       enabled: true
       namespace: omni-streaming
-      syncWave: "34"
+      syncWave: "35"
       source:
         path: "argocd/twinx/apps/ovas/05-web-viewer"
