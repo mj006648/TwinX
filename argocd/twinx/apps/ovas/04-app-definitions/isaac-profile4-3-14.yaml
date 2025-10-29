@@ -30,7 +30,7 @@ spec:
         annotations:
           metallb.universe.tf/address-pool: isaac-sim0-pool
       sessionId: session_id
-      name: issactest
+      name: issac0
       resources:
         requests:
           nvidia.com/gpu: "1"
