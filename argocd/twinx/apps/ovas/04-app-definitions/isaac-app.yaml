@@ -1,0 +1,11 @@
+# ./argocd/twinx/apps/ovas/04-app-definitions/isaac-app.yaml
+apiVersion: omniverse.nvidia.com/v1
+kind: Application
+metadata:
+  name: isaac-sim
+  labels:
+    USD: "true"
+    visualisation: "true"
+spec:
+  name: isaac-sim
+  description: isaac sim
