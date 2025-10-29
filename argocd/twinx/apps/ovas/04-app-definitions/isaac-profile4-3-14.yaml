@@ -29,7 +29,7 @@ spec:
         type: "LoadBalancer" 
         loadBalancerIP: "10.38.38.241"
       sessionId: session_id
-      name: kit-test
+      name: issac0
       resources:
         requests:
           nvidia.com/gpu: "1"
