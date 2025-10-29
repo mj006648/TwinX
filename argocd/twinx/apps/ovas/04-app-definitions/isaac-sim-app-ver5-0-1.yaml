@@ -2,9 +2,9 @@
 apiVersion: omniverse.nvidia.com/v1
 kind: ApplicationVersion
 metadata:
-  name: isaacsim1-5.0.1
+  name: isaacsim-5.0.1
   labels:
-    app: isaacsim1
+    app: isaacsim
     applicationName: isaacsim
     version: '5.0.1'
 spec:
