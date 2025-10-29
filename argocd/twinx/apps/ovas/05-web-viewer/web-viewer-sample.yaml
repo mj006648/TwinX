@@ -42,6 +42,3 @@ spec:
   - port: 80
     targetPort: 80
     protocol: TCP
-  selector:
-    app.kubernetes.io/instance: omniverse-viewer
-    app.kubernetes.io/name: omniverse-viewer-app
