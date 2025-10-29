@@ -1,15 +1,15 @@
-# isaacsim-custom-profile4-3-11.yaml
+# ./argocd/twinx/apps/ovas/04-app-definitions/isaac-app-profile-5-0.yaml
 apiVersion: omniverse.nvidia.com/v1
 kind: ApplicationProfile
 metadata:
-  name: isaacsim-custom-profile4-3-13
+  name: isaacsim-custom-profile5-0-0
 spec:
-  name: Isaacsim Custom Profile4-3-13
+  name: Isaacsim Custom Profile5-0-0
   description: Updated memory and CPU settings for Isaacsim.
   supportedApplications:
     - name: "isaacsim"
       versions:
-        - "4.3.13"
+        - "5.0.0"
   chartMappings:
     container: streamingKit.image.repository
     container_version: streamingKit.image.tag
@@ -24,10 +24,9 @@ spec:
       image:
         repository: docker.io/ich6648/ovas-isaac-sim
         pullPolicy: Always
-        tag: '4.3.13'
+        tag: '5.0.0'
       service:
-        type: "LoadBalancer" 
-        loadBalancerIP: "10.38.38.241"
+        type: "LoadBalancer"  
       sessionId: session_id
       name: kit-test
       resources:
