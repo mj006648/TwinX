@@ -4,7 +4,7 @@ kind: ApplicationProfile
 metadata:
   name: isaac-profile-5.0.0
 spec:
-  name: Isaac Custom Profile 5.0.0
+  name: Isaac Custom Profile-5.0.0
   description: Updated memory and CPU settings for Isaacsim.
   supportedApplications:
     - name: "isaac"
