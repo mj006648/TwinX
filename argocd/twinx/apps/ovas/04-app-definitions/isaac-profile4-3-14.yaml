@@ -27,7 +27,6 @@ spec:
         tag: '4.3.13'
       service:
         type: "LoadBalancer"
-        loadBalancerIP: "10.38.38.241"
       sessionId: session_id
       name: issactest
       resources:
