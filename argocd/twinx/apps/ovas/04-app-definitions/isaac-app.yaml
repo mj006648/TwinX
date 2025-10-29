@@ -2,10 +2,10 @@
 apiVersion: omniverse.nvidia.com/v1
 kind: Application
 metadata:
-  name: isaac-sim
+  name: isaac
   labels:
     USD: "true"
     visualisation: "true"
 spec:
-  name: isaac-sim
+  name: isaac
   description: isaac sim

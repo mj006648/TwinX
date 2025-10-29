@@ -2,10 +2,10 @@
 apiVersion: omniverse.nvidia.com/v1
 kind: ApplicationVersion
 metadata:
-  name: isaac-sim-5.0.0
+  name: isaac-5.0.0
   labels:
-    app: isaac-sim
-    applicationName: isaac-sim
+    app: isaac
+    applicationName: isaac
     version: '5.0.0'
 spec:
   helm_chart: ngc-omniverse/kit-appstreaming-session
