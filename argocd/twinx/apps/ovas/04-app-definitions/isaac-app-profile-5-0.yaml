@@ -20,7 +20,6 @@ spec:
         - name: changcred
         - name: regcred
     streamingKit:
-      nucleusSecretRef: nucleus-auth
       image:
         repository: docker.io/ich6648/ovas-isaac-sim
         pullPolicy: Always
