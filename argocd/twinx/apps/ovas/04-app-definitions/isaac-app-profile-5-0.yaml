@@ -9,7 +9,7 @@ spec:
   supportedApplications:
     - name: "isaac"
       versions:
-        - "5.0.0"
+        - "*"
   chartMappings:
     container: streamingKit.image.repository
     container_version: streamingKit.image.tag
@@ -20,12 +20,14 @@ spec:
         - name: changcred
         - name: regcred
     streamingKit:
+      nucleusSecretRef: nucleus-auth
       image:
         repository: docker.io/ich6648/ovas-isaac-sim
         pullPolicy: Always
         tag: '5.0.0'
       service:
         type: "LoadBalancer"  
+        loadBalancerIP: "10.38.38.240"      
       sessionId: session_id
       name: issac0
       resources:
