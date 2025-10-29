@@ -28,7 +28,7 @@ spec:
       service:
         type: "LoadBalancer"  
       sessionId: session_id
-      name: kit-test
+      name: isaac0
       resources:
         requests:
           nvidia.com/gpu: "1"
