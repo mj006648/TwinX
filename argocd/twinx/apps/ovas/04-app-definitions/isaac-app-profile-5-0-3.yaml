@@ -31,6 +31,9 @@ spec:
           metallb.universe.tf/address-pool: isaac-sim3-pool
       sessionId: session_id
       name: isaac3
+      env:
+        - name: NVIDIA_VISIBLE_DEVICES
+          value: "3"
       resources:
         requests:
           nvidia.com/gpu: "1"
