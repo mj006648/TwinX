@@ -25,13 +25,13 @@ spec:
         repository: docker.io/ich6648/ovas-isaac-sim
         pullPolicy: Always
         tag: '5.0.0'
+      args:
+        - --/rtx/multiGpu/enabled=false
+        - --/rtx/renderer/activeGpuId=0
       service:
         type: "LoadBalancer" 
         annotations:
           metallb.universe.tf/address-pool: isaac-sim0-pool
-      args:
-        - --/rtx/multiGpu/enabled=false
-        - --/rtx/renderer/activeGpuId=0
       sessionId: session_id
       name: isaac0
       env:
