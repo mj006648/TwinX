@@ -29,6 +29,9 @@ spec:
         type: "LoadBalancer" 
         annotations:
           metallb.universe.tf/address-pool: isaac-sim4-pool
+      args:
+        - --/rtx/multiGpu/enabled=false
+        - --/rtx/renderer/activeGpuId=4
       sessionId: session_id
       name: isaac4
       env:

@@ -29,6 +29,9 @@ spec:
         type: "LoadBalancer" 
         annotations:
           metallb.universe.tf/address-pool: isaac-sim3-pool
+      args:
+        - --/rtx/multiGpu/enabled=false
+        - --/rtx/renderer/activeGpuId=3
       sessionId: session_id
       name: isaac3
       env:
