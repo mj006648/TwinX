@@ -26,9 +26,6 @@ spec:
         pullPolicy: Always
         tag: '5.0.2'
       command: ["/app/kit/kit"]
-      args:
-        - --/renderer/multiGpu/enabled=false
-        - --/renderer/multiGpu/autoEnable=false
       service:
         type: "LoadBalancer" 
         annotations:
