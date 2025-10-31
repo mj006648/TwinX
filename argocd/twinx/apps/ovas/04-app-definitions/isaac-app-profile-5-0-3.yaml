@@ -25,6 +25,10 @@ spec:
         repository: docker.io/ich6648/ovas-isaac-sim
         pullPolicy: Always
         tag: '5.0.3'
+      command: ["/app/kit/kit"]
+      args:
+        - --/renderer/multiGpu/enabled=false
+        - --/renderer/multiGpu/autoEnable=false
       service:
         type: "LoadBalancer" 
         annotations:
