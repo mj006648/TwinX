@@ -3,6 +3,7 @@
 # 배포 위치를 'NodeGroup=gpu' 레이블이 있는 노드로 강제합니다.
 
 driver:
+  enable: false
   nodeSelector:
     NodeGroup: gpu
 toolkit:
