@@ -37,8 +37,6 @@ spec:
       env:
         - name: CUDA_VISIBLE_DEVICES
           value: "3"
-        - name: NVIDIA_VISIBLE_DEVICES
-          value: "0"
       resources:
         limits:
           cpu: "12"
