@@ -35,8 +35,6 @@ spec:
         - "--/renderer/multiGpu/enabled=false"
         - "--/renderer/multiGpu/autoEnable=false"      
       env:
-        - name: CUDA_VISIBLE_DEVICES
-          value: "0"
         - name: NVIDIA_VISIBLE_DEVICES
           value: "0"
       resources:

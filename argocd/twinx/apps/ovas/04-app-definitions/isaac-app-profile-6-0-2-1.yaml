@@ -32,8 +32,6 @@ spec:
       sessionId: session_id
       name: isaac2
       env:
-        - name: CUDA_VISIBLE_DEVICES
-          value: "2"
         - name: NVIDIA_VISIBLE_DEVICES
           value: "2"            
       resources:

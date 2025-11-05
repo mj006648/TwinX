@@ -35,8 +35,8 @@ spec:
         - "--/renderer/multiGpu/enabled=false"
         - "--/renderer/multiGpu/autoEnable=false"      
       env:
-        - name: CUDA_VISIBLE_DEVICES
-          value: "1"      
+        - name: NVIDIA_VISIBLE_DEVICES
+          value: "1"
       resources:
         limits:
           cpu: "12"
