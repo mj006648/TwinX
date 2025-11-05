@@ -1,0 +1,43 @@
+# ./argocd/twinx/apps/ovas/04-app-definitions/isaac-app-profile-5-0-0.yaml
+apiVersion: omniverse.nvidia.com/v1
+kind: ApplicationProfile
+metadata:
+  name: isaacsim-custom-profile6-0-0
+spec:
+  name: Isaacsim Custom Profile6-0-0
+  description: Updated memory and CPU settings for Isaacsim.
+  supportedApplications:
+    - name: "isaacsim"
+      versions:
+        - "6.0.0"
+  chartMappings:
+    container: streamingKit.image.repository
+    container_version: streamingKit.image.tag
+    name: streamingKit.name
+  chartValues:
+    global:
+      imagePullSecrets:
+        - name: changcred
+        - name: regcred
+    streamingKit:
+      nucleusSecretRef: nucleus-auth
+      image:
+        repository: docker.io/ich6648/ovas-isaac-sim
+        pullPolicy: Always
+        tag: '6.0.0'
+      service:
+        type: "LoadBalancer" 
+        annotations:
+          metallb.universe.tf/address-pool: isaac-sim0-pool
+      sessionId: session_id
+      name: isaac0
+      env:
+        - name: NVIDIA_VISIBLE_DEVICES
+          value: "0"
+      resources:
+        requests:
+          nvidia.com/gpu: "1"
+        limits:
+          cpu: "12"
+          memory: "48Gi"
+          nvidia.com/gpu: "1"
