@@ -33,9 +33,9 @@ spec:
       name: isaac1
       env:
         - name: CUDA_VISIBLE_DEVICES
-          value: "0"
+          value: "1"
         - name: NVIDIA_VISIBLE_DEVICES
-          value: "0"            
+          value: "1"            
       resources:
         limits:
           cpu: "12"
