@@ -32,10 +32,8 @@ spec:
       sessionId: session_id
       name: isaac1
       env:
-        - name: CUDA_VISIBLE_DEVICES
-          value: "1"
         - name: NVIDIA_VISIBLE_DEVICES
-          value: "1"            
+          value: "GPU-e969de42-bd16-c405-9dd8-4b84bfe09bc3"
       resources:
         limits:
           cpu: "12"
