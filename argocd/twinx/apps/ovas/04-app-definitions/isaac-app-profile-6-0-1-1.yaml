@@ -34,8 +34,9 @@ spec:
       extraArgs:
         - "--/renderer/multiGpu/enabled=false"
         - "--/renderer/multiGpu/autoEnable=false"      
-        - "--/renderer/activeGpu=1"
       env:
+        - name: CUDA_VISIBLE_DEVICES
+          value: "1"      
         - name: NVIDIA_VISIBLE_DEVICES
           value: "1"
       resources:
