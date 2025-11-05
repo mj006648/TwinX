@@ -31,9 +31,13 @@ spec:
           metallb.universe.tf/address-pool: isaac-sim1-pool
       sessionId: session_id
       name: isaac1
+      extraArgs:
+        - "--/renderer/multiGpu/enabled=false"
+        - "--/renderer/multiGpu/autoEnable=false"      
+        - "--/renderer/activeGpu=1"
       env:
         - name: NVIDIA_VISIBLE_DEVICES
-          value: "GPU-e969de42-bd16-c405-9dd8-4b84bfe09bc3"
+          value: "1"
       resources:
         limits:
           cpu: "12"
