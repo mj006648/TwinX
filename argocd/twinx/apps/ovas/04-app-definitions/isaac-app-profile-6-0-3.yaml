@@ -28,12 +28,12 @@ spec:
       service:
         type: "LoadBalancer" 
         annotations:
-          metallb.universe.tf/address-pool: isaac-sim0-pool
+          metallb.universe.tf/address-pool: isaac-sim3-pool
       sessionId: session_id
       name: isaac3
       env:
         - name: NVIDIA_VISIBLE_DEVICES
-          value: "0"
+          value: "3"
       resources:
         requests:
           nvidia.com/gpu: "1"
