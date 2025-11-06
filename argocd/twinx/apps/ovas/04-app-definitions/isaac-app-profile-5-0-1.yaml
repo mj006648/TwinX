@@ -25,7 +25,6 @@ spec:
         repository: docker.io/ich6648/ovas-isaac-sim
         pullPolicy: Always
         tag: '5.0.1'
-      command: ["/app/kit/kit"]
       service:
         type: "LoadBalancer" 
         annotations:
