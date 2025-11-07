@@ -14,6 +14,8 @@ expose:
   # - clusterIP: 클러스터 내부에서만 접근 가능한 내부 IP를 할당 (외부 노출 안 함)
   # MetalLB를 사용하고 있으므로 'loadBalancer'가 가장 적합하고 편리한 방식입니다.
   type: loadBalancer
+  annotations:
+          metallb.universe.tf/address-pool: primary-pool
 
   # --- TLS (HTTPS) 설정 ---
   tls:
