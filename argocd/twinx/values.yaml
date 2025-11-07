@@ -452,3 +452,17 @@ applications:
       syncWave: "35"
       source:
         path: "argocd/twinx/apps/ovas/05-web-viewer"
+
+    harbor:
+      enabled: true
+      namespace: harbor
+      syncWave: "36"
+      source:
+          type: helm
+          repoURL: https://helm.goharbor.io
+          chart: harbor
+          targetRevision: 1.18.0
+          helm:
+            releaseName: habor
+            valueFiles:
+              - "argocd/twinx/apps/harbor/values.yaml"

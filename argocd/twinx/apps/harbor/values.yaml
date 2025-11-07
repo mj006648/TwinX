@@ -1,0 +1,179 @@
+# argocd/twinx/apps/harbor/values.yaml
+
+# ==============================================================================
+# 1. Harbor 서비스 외부 노출 설정 (Expose Configuration)
+# ==============================================================================
+# 쿠버네티스 클러스터 외부에서 Harbor UI 및 Docker/Helm CLI가 접근할 수 있도록
+# 네트워크 서비스를 설정하는 부분입니다.
+expose:
+  # --- 서비스 노출 방식 ---
+  # type: Harbor 서비스를 외부에 노출할 방법을 지정합니다.
+  # - ingress: Ingress Controller를 통해 특정 도메인(예: harbor.example.com)으로 노출
+  # - loadBalancer: 클라우드 프로바이더나 MetalLB와 같은 구현체를 통해 외부 IP를 할당받아 노출
+  # - nodePort: 클러스터의 모든 노드에 특정 포트를 열어 외부 접근을 허용
+  # - clusterIP: 클러스터 내부에서만 접근 가능한 내부 IP를 할당 (외부 노출 안 함)
+  # MetalLB를 사용하고 있으므로 'loadBalancer'가 가장 적합하고 편리한 방식입니다.
+  type: loadBalancer
+
+  # --- TLS (HTTPS) 설정 ---
+  tls:
+    # enabled: HTTPS 통신을 활성화할지 여부를 결정합니다.
+    # 'false'로 설정하면 Harbor는 HTTP로 서비스됩니다.
+    # 일반적으로 로드밸런서나 Ingress단에서 TLS 인증서를 관리하고 TLS Termination을
+    # 수행하는 것이 더 효율적이므로, 여기서는 'false'로 설정하는 것을 권장합니다.
+    enabled: false
+
+# ==============================================================================
+# 2. 외부 접속 URL 설정 (External URL)
+# ==============================================================================
+# 이 설정은 Harbor가 자기 자신을 인식하는 주소이며 매우 중요합니다.
+# Harbor UI에 표시되는 'docker login', 'helm repo add' 등의 명령어에 이 URL이 사용되며,
+# Docker 클라이언트가 인증을 위해 통신하는 주소 정보에도 포함됩니다.
+# 반드시 사용자가 실제로 접속할 주소(도메인 또는 LoadBalancer의 외부 IP)를 정확하게 입력해야 합니다.
+externalURL: http://10.38.38.210
+
+# ==============================================================================
+# 3. 데이터 영속성 설정 (Persistence)
+# ==============================================================================
+# Harbor가 사용하는 데이터를 파드(Pod)가 재시작되어도 유지하기 위해
+# PersistentVolume(PV)과 PersistentVolumeClaim(PVC)을 사용하는 설정입니다.
+persistence:
+  # enabled: 데이터 영속성을 활성화합니다. 'false'로 설정하면 파드가 삭제될 때 모든 데이터가 사라집니다.
+  # 운영 환경에서는 반드시 'true'로 설정해야 합니다.
+  enabled: true
+
+  # resourcePolicy: 'helm uninstall' 명령으로 Harbor를 삭제할 때 PVC를 어떻게 처리할지 결정합니다.
+  # - "keep": Helm 차트만 삭제하고 PVC(데이터)는 보존합니다. 실수로 차트를 삭제해도 데이터를 지킬 수 있어 안전합니다. (강력 권장)
+  # - "" (공란): Helm 차트를 삭제할 때 PVC도 함께 삭제합니다. (데이터 유실 위험)
+  resourcePolicy: "keep"
+
+  persistentVolumeClaim:
+    # --- Registry PVC 설정 ---
+    # 컨테이너 이미지와 Helm 차트 등 실제 아티팩트 파일이 저장되는 공간입니다.
+    # 가장 많은 용량을 차지하므로 넉넉하게 설정하는 것이 좋습니다.
+    registry:
+      # storageClass: 사용할 스토리지 클래스를 지정합니다.
+      # 클러스터에 기본 스토리지 클래스가 설정되어 있다면 비워둬도 되지만,
+      # nfs-client-provisioner 등 특정 스토리지를 사용하려면 명시적으로 지정해야 합니다.
+      storageClass: "rook-ceph-block"
+      size: 500Gi
+
+    # --- Jobservice Log PVC 설정 ---
+    # 이미지 복제, 스캔, 가비지 컬렉션 등 백그라운드 작업의 로그가 저장되는 공간입니다.
+    jobservice:
+      jobLog:
+        storageClass: "rook-ceph-block"
+        size: 10Gi
+
+    # --- Database PVC 설정 ---
+    # 프로젝트, 사용자, 이미지 메타데이터 등 Harbor의 모든 설정 정보가 저장되는 PostgreSQL 데이터베이스 공간입니다.
+    database:
+      storageClass: "rook-ceph-block"
+      size: 10Gi
+
+    # --- Redis PVC 설정 ---
+    # Job Queue와 캐시 등 임시 데이터를 저장하는 Redis 데이터 공간입니다.
+    redis:
+      storageClass: "rook-ceph-block"
+      size: 5Gi
+
+    # --- Trivy PVC 설정 ---
+    # 이미지 취약점 데이터베이스(DB)가 저장되는 공간입니다.
+    # 취약점 DB는 주기적으로 업데이트되며 크기가 커질 수 있습니다.
+    trivy:
+      storageClass: "rook-ceph-block"
+      size: 20Gi
+
+# ==============================================================================
+# 4. Harbor 관리자 초기 비밀번호 설정 (Admin Password)
+# ==============================================================================
+# Harbor 설치 후 최초로 로그인할 'admin' 계정의 비밀번호입니다.
+# 보안을 위해 반드시 복잡한 비밀번호로 변경하는 것을 강력히 권장합니다.
+# 운영 환경에서는 이 값을 직접 입력하는 대신, Kubernetes Secret을 참조하도록 설정하는 것이 더 안전합니다.
+harborAdminPassword: "0070"
+
+# ==============================================================================
+# 5. 컴포넌트별 리소스 할당 (Resource Allocation)
+# ==============================================================================
+# Harbor를 구성하는 각 파드(컴포넌트)가 사용할 CPU와 메모리 양을 지정합니다.
+# - requests: 파드가 스케줄링될 때 보장받는 최소 자원 양입니다.
+# - limits: 파드가 사용할 수 있는 자원의 최대 한도입니다. 이 한도를 초과하면 파드가 재시작될 수 있습니다.
+# 클러스터의 가용 자원이 충분하므로, 안정적인 운영을 위한 권장값으로 설정했습니다.
+
+portal:
+  # Harbor의 웹 UI를 제공하는 컴포넌트입니다. 비교적 가볍습니다.
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "256Mi"
+    limits:
+      cpu: "500m"
+      memory: "512Mi"
+
+core:
+  # API 요청 처리, 인증, 프로젝트 관리 등 핵심 로직을 담당합니다.
+  resources:
+    requests:
+      cpu: "250m"
+      memory: "512Mi"
+    limits:
+      cpu: "1000m" # 1 core
+      memory: "1Gi"
+
+jobservice:
+  # 이미지 스캔, 복제 등 리소스를 많이 사용할 수 있는 백그라운드 작업을 처리합니다.
+  resources:
+    requests:
+      cpu: "250m"
+      memory: "512Mi"
+    limits:
+      cpu: "1000m" # 1 core
+      memory: "1Gi"
+
+registry:
+  # 실제 이미지 Push/Pull을 처리하는 컴포넌트입니다.
+  resources:
+    requests:
+      cpu: "150m"
+      memory: "512Mi"
+    limits:
+      cpu: "1000m" # 1 core
+      memory: "1Gi"
+
+database:
+  internal:
+    # 메타데이터를 저장하는 PostgreSQL 데이터베이스입니다. 안정적인 성능을 위해 충분한 메모리를 할당하는 것이 중요합니다.
+    resources:
+      requests:
+        cpu: "300m"
+        memory: "1Gi"
+      limits:
+        cpu: "1000m" # 1 core
+        memory: "2Gi"
+
+redis:
+  internal:
+    # 캐시 및 작업 큐를 관리하는 Redis입니다.
+    resources:
+      requests:
+        cpu: "100m"
+        memory: "256Mi"
+      limits:
+        cpu: "500m"
+        memory: "512Mi"
+# ==============================================================================
+# 6. Trivy (취약점 스캐너) 설정
+# ==============================================================================
+# 컨테이너 이미지의 보안 취약점을 검사하는 Trivy 스캐너의 활성화 여부 및 리소스 설정입니다.
+# Harbor의 핵심 기능 중 하나이므로 활성화하는 것을 강력히 권장합니다.
+trivy:
+  enabled: true
+  # Trivy는 스캔 작업 시 일시적으로 CPU와 메모리를 많이 사용합니다.
+  # 원활한 스캔을 위해 충분한 자원을 할당합니다.
+  resources:
+    requests:
+      cpu: "500m"
+      memory: "1Gi"
+    limits:
+      cpu: "2000m" # 2 cores
+      memory: "2Gi"
