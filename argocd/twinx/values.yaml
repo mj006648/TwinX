@@ -276,7 +276,7 @@ applications:
 
     # Wave 15: Spark 잡을 위한 RBAC, Secret 및 스크립트 ConfigMap
     spark-job-configs:
-      enabled: true
+      enabled: false
       namespace: spark-operator
       syncWave: "17"
       source:
