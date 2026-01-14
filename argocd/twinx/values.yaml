@@ -466,3 +466,12 @@ applications:
             releaseName: habor
             valueFiles:
               - "argocd/twinx/apps/harbor/values.yaml"
+
+    trident-infra:
+      enabled: true
+      namespace: trident
+      syncWave: "37"
+      source:
+        path: "argocd/twinx/apps/trident-ifra"
+
+

@@ -1,0 +1,28 @@
+# trident-infra/01-objectstore-claim.yaml
+apiVersion: ceph.rook.io/v1
+kind: CephObjectStore
+metadata:
+  name: trident-store
+  namespace: rook-ceph
+spec:
+  metadataPool:
+    failureDomain: osd
+    replicated:
+      size: 1
+  dataPool:
+    failureDomain: osd
+    replicated:
+      size: 1
+  gateway:
+    type: s3
+    replicas: 1 
+    port: 8080
+    resources:
+      requests:
+        cpu: "500m"
+        memory: "1Gi"
+      limits:
+        cpu: "1"
+        memory: "2Gi"
+  config:
+    "rgw_frontends": "beast port=8080"
