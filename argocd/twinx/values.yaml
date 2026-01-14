@@ -454,7 +454,7 @@ applications:
         path: "argocd/twinx/apps/ovas/05-web-viewer"
 
     harbor:
-      enabled: true
+      enabled: false
       namespace: harbor
       syncWave: "36"
       source:
@@ -472,6 +472,6 @@ applications:
       namespace: trident
       syncWave: "37"
       source:
-        path: "argocd/twinx/apps/trident-ifra"
+        path: "argocd/twinx/apps/trident-infra"
 
 
