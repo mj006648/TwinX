@@ -5,7 +5,7 @@ kind: ObjectBucketClaim
 metadata:
   # S3 클라이언트가 참조할 이름으로 통일합니다.
   name: data-trident-bucket 
-  namespace: accumulation
+  namespace: trident
 spec:
   storageClassName: rook-ceph-trident-sc 
   bucketName: trident-data
